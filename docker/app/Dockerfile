@@ -1,0 +1,15 @@
+FROM php:8-apache
+
+ARG USER_NAME=app
+ARG UID=1000
+ARG GID=1000
+
+RUN groupadd -g $GID -o $USER_NAME && \
+    useradd -m -u $UID -g $GID -o -s /bin/bash $USER_NAME
+
+RUN a2dissite 000-default
+COPY resources/apache/ports.conf /etc/apache2/ports.conf
+COPY resources/apache/site.conf /etc/apache2/sites-enabled/site.conf
+
+
+USER $USER_NAME
