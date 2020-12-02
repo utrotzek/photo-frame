@@ -1,6 +1,6 @@
 image: utrotzek/photo-frame:latest
 manifests:
-  - image: utrotzek/photo-frame:latest:latest-amd64
+  - image: utrotzek/photo-frame:latest-amd64
     platform:
       architecture: amd64
       os: linux
