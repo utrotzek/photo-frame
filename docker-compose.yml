@@ -9,7 +9,8 @@ services:
         GID: ${groupId}
         USER_NAME: ${userName}
     volumes:
-      - ./app:/var/www/html/photo_frame
+      - ./app:/var/www/html/app
+    working_dir: /var/www/html/app
     ports:
     - "8080:8080"
     - "443:8443"

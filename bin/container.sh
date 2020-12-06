@@ -1,14 +1,20 @@
 #!/usr/bin/env bash
+set -e
+rootPath="$( dirname $(dirname "$(readlink -f "$0")"))"
+
+skipInstall=0
 
 function initializeCommands {
     case "$1" in
         start)
+            initStartOptions "$@"
             start
             ;;
         stop)
             stop
             ;;
         restart)
+            initStartOptions "$@"
             restart
             ;;
         status)
@@ -31,6 +37,36 @@ function copyEnvExample {
 function startContainer {
     #start container
     docker-compose -f docker-compose.yml up --build -d
+    installEnvironment
+}
+
+function installEnvironment {
+    if [[ skipInstall -eq 0 ]]; then
+        ${rootPath}/bin/composer.sh install
+        ${rootPath}/bin/npm.sh install
+        ${rootPath}/bin/npm.sh run dev
+    fi
+}
+
+function initStartOptions {
+    #parse options
+    while [ $# -gt 0 ]; do
+      case "$1" in
+        --skip-install)
+            echo -e "\e[33mskipping install scripts (composer/node js)\e[39m"
+          skipInstall=1
+          ;;
+        -s)
+            echo -e "\e[33mskipping install scripts (composer/node js)\e[39m"
+          skipInstall=1
+          ;;
+        --help)
+            echo "start|restart --skip-install (skips composer and npm install)"
+            exit 0
+          ;;
+      esac
+      shift
+    done
 }
 
 function start {
@@ -53,6 +89,8 @@ function status {
 
 function main {
     initializeCommands $@
+
+
 }
 
 main $@
