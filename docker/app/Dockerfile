@@ -11,5 +11,7 @@ RUN a2dissite 000-default
 COPY resources/apache/ports.conf /etc/apache2/ports.conf
 COPY resources/apache/site.conf /etc/apache2/sites-enabled/site.conf
 
+RUN apt-get update && \
+    apt-get install -y nodejs npm
 
 USER $USER_NAME
