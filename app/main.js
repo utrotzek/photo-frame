@@ -24,7 +24,7 @@ const previousSlide = () => {
   every 2.1 seconds and starting all over.
 */
 
-let slideInterval = setInterval(nextSlide, 8000);
+let slideInterval = setInterval(nextSlide, 13000);
 
 // which slide to move to as denoted by "s"
 const goToSlide = (s) => {
