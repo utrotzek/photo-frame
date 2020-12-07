@@ -14,6 +14,8 @@ RUN apt-get update && \
         npm
 
 RUN a2dissite 000-default
+RUN a2enmod rewrite
+
 COPY resources/apache/ports.conf /etc/apache2/ports.conf
 COPY resources/apache/site.conf /etc/apache2/sites-enabled/site.conf
 
