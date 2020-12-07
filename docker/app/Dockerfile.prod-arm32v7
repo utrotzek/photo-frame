@@ -21,6 +21,9 @@ RUN apt-get update && \
         nodejs \
         npm
 
+COPY docker/app/resources/php/composer.phar /usr/bin/composer
+
+
 # ------------------------------------------------------------------------------
 # install the app
 # ------------------------------------------------------------------------------
