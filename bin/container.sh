@@ -52,11 +52,7 @@ function initStartOptions {
     #parse options
     while [ $# -gt 0 ]; do
       case "$1" in
-        --skip-install)
-            echo -e "\e[33mskipping install scripts (composer/node js)\e[39m"
-          skipInstall=1
-          ;;
-        -s)
+        --skip-install|-s)
             echo -e "\e[33mskipping install scripts (composer/node js)\e[39m"
           skipInstall=1
           ;;
