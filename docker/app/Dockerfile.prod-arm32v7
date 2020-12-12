@@ -31,7 +31,7 @@ COPY app /var/www/html/photo_frame
 WORKDIR /var/www/html/photo_frame
 RUN composer install && \
     npm install && \
-    npm prod
+    npm run prod
 
 # ------------------------------------------------------------------------------
 # configure apache
