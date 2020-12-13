@@ -8,9 +8,22 @@ services:
         UID: ${userId}
         GID: ${groupId}
         USER_NAME: ${userName}
+    environment:
+      DB_HOST: db
+      DB_PORT: 3306
+      DB_DATABASE: ${dbName}
+      DB_USERNAME: ${dbUser}
+      DB_PASSWORD: ${dbPassword}
     volumes:
       - ./app:/var/www/html/app
     working_dir: /var/www/html/app
     ports:
     - "8080:8080"
     - "443:8443"
+  db:
+    image: mariadb:10.5
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: ${dbName}
+      MYSQL_USER: ${dbUser}
+      MYSQL_PASSWORD: ${dbPassword}
