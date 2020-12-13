@@ -32,6 +32,7 @@ Vue.use(VueRouter)
 import App from '../js/components/App';
 import Home from '../js/components/Home';
 import Slideshow from '../js/components/Slideshow';
+import RemoteControl from '../js/components/RemoteControl';
 
 const router = new VueRouter({
     mode: "history",
@@ -47,6 +48,11 @@ const router = new VueRouter({
             path: "/slideshow",
             name: "slideshow",
             component: Slideshow
+        },
+        {
+            path: "/remote-control",
+            name: "remote control",
+            component: RemoteControl
         },
     ]
 });

@@ -1,25 +1,21 @@
 <template>
-    <div id="slideshow">
-        <ul id="all_slides">
-            <li
-                v-for="(item) in images"
-                :key="item.id"
-                class="slide"
-                :class="{active: item.active}"
-                :style="{ backgroundImage: 'url(' + item.path + ')' }"
-            />
-        </ul>
-
-        <div class="buttons">
-            <button class="controls" id="previous" @click="prev"><i class="far fa-arrow-alt-circle-left"></i></button>
-            <button class="controls" id="pause" @click="togglePause"><i class="far fa-pause-circle"></i></button>
-            <button class="controls" id="next" @click="next"><i class="far fa-arrow-alt-circle-right"></i></button>
+    <div id="remote-control">
+        <div class="container">
+            <h1>Fernbedienung</h1>
+            <h2>Aktuelles Album: Urlaube</h2>
+            <h1><i class="fa fa-globe"></i> Hello, world!</h1>
+            <div class="row">
+                <div class="col">
+                    <div class="btn-group" role="group" aria-label="Basic example">
+                        <button type="button" class="btn btn-secondary"><i class="fas fa-step-backward"></i> Zurück</button>
+                        <button type="button" class="btn btn-secondary">Pause</button>
+                        <button type="button" class="btn btn-secondary">Vor</button>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 </template>
-<style>
-    @import '/css/slideshow.css';
-</style>
 
 <script>
 export default {
@@ -54,7 +50,6 @@ export default {
         triggerSlideshow: function(){
             if (!this.pause) {
                 this.next();
-                console.info("next-image");
             }
         },
         togglePause: function(){
