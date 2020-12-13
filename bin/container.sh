@@ -29,9 +29,11 @@ function copyEnvExample {
     uid=$(id -u)
     guid=$(id -g)
 
-    cat .env-template |
-    sed -e "s/{uid}/${uid}/" |
-    sed -e "s/{gid}/${guid}/" > .env
+    if [[ ! -f ${rootPath}/.env ]]; then
+        cat .env-template |
+        sed -e "s/{uid}/${uid}/" |
+        sed -e "s/{gid}/${guid}/" > .env
+    fi
 }
 
 function startContainer {
