@@ -29,7 +29,7 @@ USER $USER_NAME
 # ------------------------------------------------------------------------------
 # install the app
 # ------------------------------------------------------------------------------
-COPY --chown=$USER_NAME. app /var/www/html/app
+COPY --chown=$USER_NAME:$USER_NAME app /var/www/html/app
 WORKDIR /var/www/html/app
 RUN composer install && \
     npm install && \
