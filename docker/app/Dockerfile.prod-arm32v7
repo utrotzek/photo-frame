@@ -23,16 +23,6 @@ RUN apt-get update && \
 
 COPY docker/app/resources/php/composer.phar /usr/bin/composer
 
-
-# ------------------------------------------------------------------------------
-# install the app
-# ------------------------------------------------------------------------------
-COPY app /var/www/html/photo_frame
-WORKDIR /var/www/html/photo_frame
-RUN composer install && \
-    npm install && \
-    npm run prod
-
 # ------------------------------------------------------------------------------
 # configure apache
 # ------------------------------------------------------------------------------
@@ -41,3 +31,12 @@ COPY docker/app/resources/apache/ports.conf /etc/apache2/ports.conf
 COPY docker/app/resources/apache/site.conf /etc/apache2/sites-enabled/site.conf
 
 USER $USER_NAME
+
+# ------------------------------------------------------------------------------
+# install the app
+# ------------------------------------------------------------------------------
+COPY --chown=$USER_NAME. app /var/www/html/app
+WORKDIR /var/www/html/app
+RUN composer install && \
+    npm install && \
+    npm run prod
