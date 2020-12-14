@@ -3,13 +3,12 @@
         <div class="container">
             <h1>Fernbedienung</h1>
             <h2>Aktuelles Album: Urlaube</h2>
-            <h1><i class="fa fa-globe"></i> Hello, world!</h1>
             <div class="row">
                 <div class="col">
                     <div class="btn-group" role="group" aria-label="Basic example">
-                        <button type="button" class="btn btn-secondary"><i class="fas fa-step-backward"></i> Zurück</button>
-                        <button type="button" class="btn btn-secondary">Pause</button>
-                        <button type="button" class="btn btn-secondary">Vor</button>
+                        <button type="button" class="btn btn-secondary"><i class="las la-arrow-circle-left"></i> Zurück</button>
+                        <button type="button" class="btn btn-secondary"><i class="las la-pause-circle"></i> Pause</button>
+                        <button type="button" class="btn btn-secondary">Vor <i class="las la-arrow-alt-circle-right"></i></button>
                     </div>
                 </div>
             </div>
