@@ -11,7 +11,7 @@ body {
     list-style-type: none;
 }
 
-.slide{
+.slide {
     position: absolute;
     left: 0px;
     top: 0px;
@@ -23,6 +23,13 @@ body {
     -moz-transition: opacity 10s;
     -o-transition: opacity 10s;
     transition: opacity 10s;
+}
+
+.slide.no-transition {
+    -webkit-transition: none;
+    -moz-transition: none;
+    -o-transition: none;
+    transition: none;
 }
 
 .active{
@@ -82,4 +89,35 @@ body {
     top: 0px;
     z-index: 10;
     font-size: 0px;
+}
+
+
+#command-info-wrapper {
+    height: 100%;
+    position: absolute;
+    width: 100%;
+    top: 0;
+    left: 0;
+}
+
+#command-info {
+    opacity: 60%;
+    z-index: 99;
+    font-size: 8rem;
+    bottom: 0;
+    height: 100px;
+    left: 0;
+    margin: auto;
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 100px;
+    -webkit-transition: opacity 3s;
+    -moz-transition: opacity 3s;
+    -o-transition: opacity 3s;
+    transition: opacity 3s;
+}
+
+#command-info .active {
+    opacity: 0;
 }
