@@ -100,8 +100,8 @@ body {
     left: 0;
 }
 
-#command-info {
-    opacity: 60%;
+#command-info .icon {
+    display: none;
     z-index: 99;
     font-size: 8rem;
     bottom: 0;
@@ -112,12 +112,27 @@ body {
     top: 0;
     right: 0;
     width: 100px;
-    -webkit-transition: opacity 3s;
-    -moz-transition: opacity 3s;
-    -o-transition: opacity 3s;
-    transition: opacity 3s;
+}
+
+@keyframes showCommandInfoIcon{
+    0%{
+        opacity: 90%;
+        transform: rotateX(90deg);
+    }
+    50%{
+        opacity: 80%;
+        transform: rotateX(0deg);
+    }
+    100%{
+        opacity: 0;
+        display: none;
+        transform: rotateX(90deg);
+    }
 }
 
 #command-info .active {
-    opacity: 0;
+    display: block;
+    animation-name: showCommandInfoIcon;
+    animation-duration: 1000ms;
+    animation-fill-mode: forwards;
 }

@@ -2,10 +2,12 @@
     <div id="slideshow">
         <div id="command-info-wrapper">
             <div id="command-info">
-                <i class="icon las la-pause-circle"></i>
+                <i class="icon las la-pause-circle" :class="{active: commandInfo.pause}"></i>
+                <i class="icon las la-play-circle" :class="{active: commandInfo.play}"></i>
+                <i class="icon las la-step-forward" :class="{active: commandInfo.next}"></i>
+                <i class="icon las la-step-backward" :class="{active: commandInfo.prev}"></i>
             </div>
         </div>
-
 
         <ul id="all_slides">
             <li
@@ -32,6 +34,12 @@ export default {
             pause: false,
             waitForExecution: false,
             enableTransition: true,
+            commandInfo: {
+                pause: false,
+                prev: false,
+                next: false,
+                play: false,
+            },
             images: [
                 {
                     id: 0,
@@ -59,8 +67,14 @@ export default {
         setIntervals () {
             clearInterval(this.slideshowInterval);
             clearInterval(this.pollCommandsInterval);
-            this.slideshowInterval = setInterval(() => this.triggerSlideshow(), 5000);
+            this.slideshowInterval = setInterval(() => this.triggerSlideshow(), 10000);
             this.pollCommandsInterval = setInterval(() => this.pollCommands(), 1000);
+        },
+        disableCommandInfos () {
+            this.commandInfo.next = false;
+            this.commandInfo.pause = false;
+            this.commandInfo.prev = false;
+            this.commandInfo.play = false;
         },
         pollCommands: function() {
             if (!this.waitForExecution){
@@ -74,6 +88,7 @@ export default {
                         }
                         this.commands = [];
                     });
+                this.disableCommandInfos();
             }
         },
         executeCommands (commands) {
@@ -82,15 +97,19 @@ export default {
                 const cmd = commands[i];
                 switch (cmd.command) {
                     case "next":
+                        this.commandInfo.next = true;
                         this.next();
                         break;
                     case "prev":
+                        this.commandInfo.prev = true;
                         this.prev();
                         break;
                     case "pause":
+                        this.commandInfo.pause = true;
                         this.togglePause();
                         break;
                     case "play":
+                        this.commandInfo.play = true;
                         this.togglePause();
                         this.setIntervals();
                         break;
