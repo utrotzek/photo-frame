@@ -60,6 +60,7 @@ USER $USER_NAME
 COPY --chown=$USER_NAME:$USER_NAME app /var/www/html/app
 WORKDIR /var/www/html/app
 RUN composer install && \
+    npm config set registry http://registry.npmjs.org/ && \
     npm install && \
     npm run prod
 
