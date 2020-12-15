@@ -52,6 +52,8 @@ COPY docker/app/resources/php/composer.phar /usr/bin/composer
 # configure apache
 # ------------------------------------------------------------------------------
 RUN a2dissite 000-default
+RUN a2enmod rewrite
+
 COPY docker/app/resources/apache/ports.conf /etc/apache2/ports.conf
 COPY docker/app/resources/apache/site.conf /etc/apache2/sites-enabled/site.conf
 
