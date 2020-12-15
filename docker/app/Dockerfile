@@ -12,7 +12,7 @@ RUN groupadd -g $GID -o $USER_NAME && \
     useradd -m -u $UID -g $GID -o -s /bin/bash $USER_NAME
 
 RUN apt-get update && \
-    apt-get install -yq \
+    apt-get install -y \
         unzip \
         nodejs \
         vim \
@@ -20,7 +20,8 @@ RUN apt-get update && \
         apache2 \
         openssh-client \
         software-properties-common \
-        ca-certificates
+        ca-certificates && \
+    rm -rf /var/lib/apt/lists/*
 
 RUN add-apt-repository ppa:ondrej/php && \
     apt-get update && \
