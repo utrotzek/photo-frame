@@ -63,9 +63,11 @@ USER $USER_NAME
 # ------------------------------------------------------------------------------
 COPY --chown=$USER_NAME:$USER_NAME app /var/www/html/app
 WORKDIR /var/www/html/app
+
+#run npm dev because of a bug with non working animations in production context
 RUN composer install && \
     npm config set registry http://registry.npmjs.org/ && \
     npm install && \
-    npm run prod
+    npm run dev
 
 CMD ["/usr/sbin/apachectl", "-D", "FOREGROUND"]
