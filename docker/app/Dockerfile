@@ -15,6 +15,7 @@ RUN apt-get update && \
     apt-get install -yq \
         unzip \
         nodejs \
+        vim \
         npm \
         apache2 \
         openssh-client \

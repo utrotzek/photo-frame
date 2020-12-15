@@ -16,6 +16,7 @@ RUN apt-get update && \
         unzip \
         nodejs \
         npm \
+        vim \
         apache2 \
         openssh-client \
         software-properties-common \
