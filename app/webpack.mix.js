@@ -19,15 +19,8 @@ mix.webpackConfig({
     }
 });
 
-//disable this to improve compiling performance
-mix.options({ processCssUrls: false });
-
 mix.js('resources/js/app.js', 'public/js')
     .sass('resources/sass/app.scss', 'public/css')
     .sass('resources/sass/slideshow.scss', 'public/css')
     //.sourceMaps()
 ;
-
-//workaround to make fonts available in the app because the
-//assets wont be copied automatically by webpack
-mix.copyDirectory('resources/libraries/line-awesome-1.3.0/fonts', 'public/fonts');
