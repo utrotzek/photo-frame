@@ -17,8 +17,11 @@ Route::middleware('auth:api')->get('/user', function (Request $request) {
     return $request->user();
 });
 
+//commands
 Route::delete('/commands/clearView/{view}', [\App\Http\Controllers\CommandController::class, 'clearView']);
-
 Route::apiResources([
     'commands' => \App\Http\Controllers\CommandController::class
 ]);
+
+//index
+Route::get('/index/state', [\App\Http\Controllers\IndexController::class, 'state']);
