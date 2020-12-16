@@ -1,6 +1,7 @@
 body {
     margin: 0px;
     padding: 0px;
+    cursor: none;
 }
 
 #all_slides {
@@ -10,7 +11,6 @@ body {
         padding: 0px;
         margin: 0px;
         list-style-type: none;
-        cursor: none;
     }
 
     .slide {
