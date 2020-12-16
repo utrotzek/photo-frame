@@ -16,6 +16,7 @@ services:
       DB_PASSWORD: ${dbPassword}
     volumes:
       - ./app:/var/www/html/app
+      - ./data/fixtures/images:/var/images
     working_dir: /var/www/html/app
     ports:
     - "8080:8080"
