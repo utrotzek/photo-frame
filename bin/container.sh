@@ -28,9 +28,11 @@ function copyEnvExample {
 
     uid=$(id -u)
     guid=$(id -g)
+    hostIp=$(hostname -I | cut -d' ' -f1)
 
     if [[ ! -f ${rootPath}/.env ]]; then
         cat .env-template |
+        sed -e "s/{hostIp}/${hostIp}/" |
         sed -e "s/{uid}/${uid}/" |
         sed -e "s/{gid}/${guid}/" > .env
     fi

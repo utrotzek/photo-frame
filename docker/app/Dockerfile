@@ -35,6 +35,7 @@ RUN add-apt-repository ppa:ondrej/php && \
         php${PHP_VERSION}-tokenizer \
         php${PHP_VERSION}-ctype \
         php${PHP_VERSION}-bcmath \
+        php${PHP_VERSION}-xdebug \
         libapache2-mod-php
 
 RUN a2dissite 000-default
