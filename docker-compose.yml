@@ -30,3 +30,5 @@ services:
       MYSQL_DATABASE: ${dbName}
       MYSQL_USER: ${dbUser}
       MYSQL_PASSWORD: ${dbPassword}
+    ports:
+    - "3306:3306"
