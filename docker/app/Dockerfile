@@ -53,4 +53,5 @@ RUN chown -R $USER_NAME:$USER_NAME /var/lock/apache2*
 RUN chown -R $USER_NAME:$USER_NAME /var/run/apache2*
 USER $USER_NAME
 
-CMD ["/usr/sbin/apachectl", "-D", "FOREGROUND"]
+COPY resources/start.sh /usr/bin/local/start.sh
+CMD ["/usr/bin/local/start.sh"]
