@@ -6,6 +6,7 @@ namespace App\Tasks;
 
 use App\Models\IndexState;
 use App\Models\Index;
+use DateTime;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\Finder\SplFileInfo;
 
@@ -13,21 +14,31 @@ class FileIndexTask
 {
     protected $imageRootDirectory = '/var/images';
     protected $indexFileExtensions = ['*.JPG', '*.jpg', '*.JPEG', '*.png', '*.PNG'];
+    protected $excludedDirectories = ['Handy upload', 'unsortiert'];
 
     protected $maxRetries = 7;
 
     protected IndexState $indexState;
+    protected DateTime $indexTime;
 
-    public function updateIndex()
+    /**
+     * Does a full index update by not respecting any modification dates
+     * @throws \Exception
+     */
+    public function completeIndexUpdate()
     {
-        $this->initializeIndexState();
-
         try {
+            $this->initializeIndexState();
+            $this->indexTime = new DateTime();
+            $this->indexState['last_run'] = $this->indexTime;
             if (
                 $this->indexState['state'] ===  IndexState::STATE_WAITING ||
                 ($this->indexState['state'] ===  IndexState::STATE_FAILED && $this->indexState['retries'] < $this->maxRetries)
             ) {
-                $this->updateIndexComplete();
+                $finder = $this->getConfiguredFinder();
+                $this->indexState->setWorking($finder->count());
+
+                $this->updateIndexComplete($finder);
                 $this->cleanUpIndex();
 
                 $this->indexState->setFinished();
@@ -47,7 +58,6 @@ class FileIndexTask
     {
         /** @var IndexState $indexState */
         $indexState = IndexState::query()->findOrNew(1);
-        $indexState['state'] = IndexState::STATE_WAITING;
         $this->indexState = $indexState;
         $this->indexState->save();
         $this->indexState->fresh();
@@ -56,22 +66,23 @@ class FileIndexTask
     /**
      * Finds all files in the image directory and updates the index entry
      */
-    protected function updateIndexComplete()
+    protected function updateIndexComplete(Finder $finder)
+    {
+        foreach ($finder as $file) {
+            $this->indexFile($file);
+        }
+    }
+
+    protected function getConfiguredFinder(): Finder
     {
         $finder = new Finder();
         $finder
             ->in($this->imageRootDirectory)
             ->name($this->indexFileExtensions)
+            ->exclude($this->excludedDirectories)
             ->files()
         ;
-
-        $this->indexState->setWorking($finder->count());
-
-        foreach ($finder as $file) {
-            $this->indexFile($file);
-            $this->indexState['current']+=1;
-            $this->indexState->save();
-        }
+        return $finder;
     }
 
     /**
@@ -81,10 +92,10 @@ class FileIndexTask
      */
     protected function cleanUpIndex()
     {
-        $notUpdated = Index::query()->where('last_indexed', '<', $this->indexState['last_run'])->get();
+        $notUpdated = Index::query()->where('last_indexed', '<', $this->indexTime)->get();
         /** @var Index $index */
         foreach ($notUpdated as $index) {
-            if (!file_exists($index['full_path'])) {
+            if (!file_exists($index->getFilePath())) {
                 $index->delete();
             }
         }
@@ -92,21 +103,23 @@ class FileIndexTask
 
     /**
      * Adds a new index entry to the database
-     *
-     * @param SplFileInfo $file
      */
     protected function indexFile(SplFileInfo $file)
     {
         Index::query()->updateOrCreate(
-            ['full_path' => $file->getRealPath()],
             [
-                'file_name' => (string)$file->getFilename(),
+                'path' => $file->getPath(),
+                'file_name' => (string)$file->getFilename()
+            ],
+            [
                 'year' =>  $this->extractYear($file),
                 'month' => date('m', $file->getCTime()),
                 'base_name' => $file->getPathInfo()->getBasename(),
-                'last_indexed' => $this->indexState['last_run']
+                'last_indexed' => $this->indexTime
             ]
         );
+        $this->indexState['current']+=1;
+        $this->indexState->save();
     }
 
     /**

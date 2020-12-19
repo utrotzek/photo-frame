@@ -12,7 +12,7 @@ class IndexingCommand extends Command
      *
      * @var string
      */
-    protected $signature = 'index:execute';
+    protected $signature = 'index:execute {--full}';
 
     /**
      * The console command description.
@@ -41,7 +41,12 @@ class IndexingCommand extends Command
      */
     public function handle()
     {
-        $this->fileIndexTask->updateIndex();
+        if ($this->option('full')){
+            $this->fileIndexTask->completeIndexUpdate();
+        }else{
+            //increment
+            throw new \Exception("Not implemented");
+        }
         return 0;
     }
 }

@@ -16,7 +16,7 @@ class CreateIndexTable extends Migration
         Schema::create('index', function (Blueprint $table) {
             $table->id();
             $table->timestamps();
-            $table->string('full_path');
+            $table->string('path');
             $table->string('file_name');
             $table->integer('year');
             $table->integer('month');

@@ -12,11 +12,15 @@ class Index extends Model
     protected $table = 'index';
 
     protected $fillable = [
-        'full_path',
+        'path',
         'file_name',
         'year' ,
         'month' ,
         'base_name',
         'last_indexed'
     ];
+
+    public function getFilePath(){
+        return "{$this->path}/{$this->file_name}";
+    }
 }
