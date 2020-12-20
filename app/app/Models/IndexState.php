@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use DateTime;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
@@ -27,15 +28,16 @@ class IndexState extends Model
         $this->total = $count;
         $this->current = 0;
         $this->retries = 0;
-        $this->last_run = new \DateTime();
+        $this->last_run = new DateTime();
         $this->save();
     }
 
-    public function setFinished()
+    public function setFinished(DateTime $indexTime)
     {
         $this->state = IndexState::STATE_WAITING;
         $this->current = 0;
         $this->total = 0;
+        $this->last_run = $indexTime;
         $this->save();
     }
 
