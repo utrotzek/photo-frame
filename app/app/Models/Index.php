@@ -26,6 +26,6 @@ class Index extends Model
 
     public function getPublicFilePath() {
         $publicPath = str_replace(config('slideshow.imagePath'), '/images', $this->path);
-        return "{$publicPath}/{$this->file_name}";
+        return "{$publicPath}";
     }
 }

@@ -26,12 +26,22 @@ class QueueController extends Controller
         );
     }
 
-    public function nextBatch(Request $request)
+    public function nextBatch(Request $request): Response
     {
         $limit = $request->input('limit') ?? 10;
         return new Response(
             QueueResource::collection(
                 Queue::findNextBatch($limit)
+            )
+        );
+    }
+
+    public function previousBatch(Request $request): Response
+    {
+        $limit = $request->input('limit') ?? 10;
+        return new Response(
+            QueueResource::collection(
+                Queue::findPreviousBatch($limit)
             )
         );
     }

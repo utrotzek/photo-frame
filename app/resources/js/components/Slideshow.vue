@@ -15,7 +15,7 @@
                 :key="item.id"
                 class="slide"
                 :class="{active: item.active, 'no-transition': !enableTransition}"
-                :style="{ backgroundImage: 'url(' + item.path + ')' }"
+                :style="{ backgroundImage: 'url(\'' + encodeURI(item.path) + '\')' }"
             />
         </ul>
     </div>
@@ -28,6 +28,7 @@
 export default {
     data () {
         return {
+            batchSize: 3,
             active:  0,
             pollCommandsInterval: null,
             slideshowInterval: null,
@@ -40,30 +41,86 @@ export default {
                 next: false,
                 play: false,
             },
-            images: [
-                {
-                    id: 0,
-                    path: "/images/1.jpg",
-                    active: true
-                },
-                {
-                    id: 1,
-                    path: "/images/2.jpg",
-                    active: false
-                },
-                {
-                    id: 2,
-                    path: "/images/3.jpg",
-                    active: false
-                }
-            ]
+            images: []
 
         };
     },
     created() {
         this.setIntervals();
     },
+    mounted() {
+        this.loadCurrentImage();
+        this.loadPreviousBatch();
+        this.loadNextBatch();
+    },
     methods: {
+        loadCurrentImage() {
+            console.log("current function");
+            axios.get('/api/queue/current')
+                .then(res => {
+                    let found = false, count = 0, foundIndex, currentImage;
+                    this.images.forEach(image => {
+                        if (image.id === res.data.id){
+                            image.active = true;
+                            currentImage = image;
+                            found = true;
+                            foundIndex=count;
+                        }else{
+                            image.active = false
+                        }
+                        count++;
+                    });
+
+                    if (found) {
+                        if (foundIndex >= this.images.length-1){
+                            //load next batch if last item is reached
+                            this.loadNextBatch();
+                        }else if (foundIndex === 0) {
+                            //load previous batch if last item is reached
+                            this.loadPreviousBatch();
+                        }
+                    } else {
+                        const newImage = {
+                            id: res.data.id,
+                            path: res.data.file_path,
+                            active: true
+                        };
+                        this.images.push(newImage)
+                    }
+                })
+        },
+        loadNextBatch() {
+            axios.get('/api/queue/nextBatch?limit=' + this.batchSize)
+                .then(res => {
+                    res.data.forEach(imageItem => {
+                        const found = this.images.some(el => el.id === imageItem.id);
+                        //add if not exists already
+                        if (!found){
+                            this.images.push({
+                                id: imageItem.id,
+                                path: imageItem.file_path,
+                                active: false
+                            })
+                        }
+                    });
+                });
+        },
+        loadPreviousBatch() {
+            axios.get('/api/queue/previousBatch?limit=' + this.batchSize)
+                .then(res => {
+                    res.data.forEach(imageItem => {
+                        const newItem = {
+                            id: imageItem.id,
+                            path: imageItem.file_path,
+                            active: false
+                        };
+                        const found = this.images.some(el => el.id === imageItem.id);
+                        if (!found){
+                            this.images.unshift(newItem);
+                        }
+                    });
+                });
+        },
         setIntervals () {
             clearInterval(this.slideshowInterval);
             clearInterval(this.pollCommandsInterval);
@@ -127,29 +184,16 @@ export default {
             this.pause=!this.pause;
         },
         next: function() {
-            console.log(this.enableTransition);
-            console.info("next-image");
-
-            var next = this.active+1;
-
-            if (next >= this.images.length){
-                next = 0;
-            }
-
-            this.images[this.active].active = false;
-            this.images[next].active = true;
-            this.active = next;
+            axios.put('/api/queue/move', {direction: 'forward'})
+                 .then(res => {
+                    this.loadCurrentImage()
+                 });
         },
         prev: function() {
-            var prev = this.active-1;
-
-            if (prev < 0){
-                prev = this.images.length-1;
-            }
-
-            this.images[this.active].active = false;
-            this.images[prev].active = true;
-            this.active = prev;
+            axios.put('/api/queue/move', {direction: 'backward'})
+                .then(res => {
+                    this.loadCurrentImage();
+                });
         }
     }
 };

@@ -51,10 +51,34 @@ class Queue extends Model
         for ($i=0;$i < $limit; $i++){
             $nextItem = $lastItem->getNextItem();
 
-            if ($nextItem){
-                $batch[] = $nextItem ;
-                $lastItem = $nextItem;
+            if (!$nextItem) {
+                //abort if no nextItem was found
+                continue;
             }
+            $batch[] = $nextItem ;
+            $lastItem = $nextItem;
+        }
+        return $batch;
+    }
+
+    /**
+     * Finds the previos $limit queue items depending on the current queue items
+     */
+    public static function findPreviousBatch(int $limit = 10): array
+    {
+        $current = self::findCurrent();
+        $batch = [];
+
+        $lastItem = $current;
+        for ($i=0;$i < $limit; $i++){
+            $nextItem = $lastItem->getPreviousItem();
+
+            if (!$nextItem) {
+                //abort if no previous item was found
+                continue;
+            }
+            $batch[] = $nextItem ;
+            $lastItem = $nextItem;
         }
         return $batch;
     }
