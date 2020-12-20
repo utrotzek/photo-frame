@@ -15,7 +15,7 @@ class QueueResource extends JsonResource
      */
     public function toArray($request)
     {
-        $filePath = "{$this->index->path}/{$this->index->file_name}";
+        $filePath = "{$this->index->getPublicFilePath()}/{$this->index->file_name}";
         return [
             'id' => $this->id,
             'state' => $this->state,

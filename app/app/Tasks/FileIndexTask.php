@@ -104,7 +104,7 @@ class FileIndexTask
     {
         $finder = new Finder();
         $finder
-            ->in($this->imageRootDirectory)
+            ->in(config('slideshow.imagePath'))
             ->name($this->indexFileExtensions)
             ->exclude($this->excludedDirectories)
             ->files()
