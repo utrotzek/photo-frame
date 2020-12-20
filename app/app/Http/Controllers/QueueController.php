@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Resources\QueueResource;
+use App\Models\Queue;
 use App\Processor\QueueProcessor;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
@@ -13,6 +15,25 @@ class QueueController extends Controller
     public function __construct(QueueProcessor $queueProcessor)
     {
         $this->queueProcessor = $queueProcessor;
+    }
+
+    public function current()
+    {
+        return new Response(
+            new QueueResource(
+                Queue::findCurrent()
+            )
+        );
+    }
+
+    public function nextBatch(Request $request)
+    {
+        $limit = $request->input('limit') ?? 10;
+        return new Response(
+            QueueResource::collection(
+                Queue::findNextBatch($limit)
+            )
+        );
     }
 
     public function create(Request $request): Response{

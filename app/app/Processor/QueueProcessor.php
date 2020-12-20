@@ -46,12 +46,12 @@ class QueueProcessor
         foreach ($indexArray as $index) {
             $queue = new Queue();
             $queue->index()->associate($index);
-            $queue['state'] = 'queued';
+            $queue['state'] = (is_null($lastItem)) ? 'current': 'queued';
             $queue->save();
             $queue->fresh();
 
             if ($lastItem) {
-                $queue->parent()->associate($queue);
+                $queue->parent()->associate($lastItem);
                 $queue->save();
             }
             $lastItem = $queue;
