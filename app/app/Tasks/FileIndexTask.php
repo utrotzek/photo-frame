@@ -14,7 +14,7 @@ class FileIndexTask
 {
     protected $imageRootDirectory = '/var/images';
     protected $indexFileExtensions = ['*.JPG', '*.jpg', '*.JPEG', '*.png', '*.PNG'];
-    protected $excludedDirectories = ['Handy upload', 'unsortiert'];
+    protected $excludedDirectories = ['Handy upload', 'Unsortiert'];
 
     protected $maxRetries = 7;
 
@@ -122,9 +122,7 @@ class FileIndexTask
         $notUpdated = Index::query()->where('last_indexed', '<', $this->indexTime)->get();
         /** @var Index $index */
         foreach ($notUpdated as $index) {
-            if (!file_exists($index->getFilePath())) {
-                $index->delete();
-            }
+            $index->delete();
         }
     }
 
