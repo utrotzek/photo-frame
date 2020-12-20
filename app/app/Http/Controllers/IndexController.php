@@ -4,7 +4,6 @@ namespace App\Http\Controllers;
 
 use App\Models\IndexState;
 use Illuminate\Http\Response;
-use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 class IndexController extends Controller
 {
