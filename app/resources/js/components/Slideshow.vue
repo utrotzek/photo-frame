@@ -121,6 +121,13 @@ export default {
                     });
                 });
         },
+        garbageCollection () {
+            const activeIndex = this.images.map(function(x) {return x.active; }).indexOf(true);
+
+            if (activeIndex >= this.batchSize * 3) {
+                this.images.splice(0, this.batchSize*2);
+            }
+        },
         setIntervals () {
             clearInterval(this.slideshowInterval);
             clearInterval(this.pollCommandsInterval);
@@ -178,6 +185,7 @@ export default {
             this.enableTransition = true;
             if (!this.pause && !this.waitForExecution) {
                 this.next();
+                this.garbageCollection();
             }
         },
         togglePause: function(){
