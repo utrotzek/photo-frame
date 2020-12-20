@@ -31,23 +31,70 @@ class FileIndexTask
             $this->initializeIndexState();
             $this->indexTime = new DateTime();
             $this->indexState['last_run'] = $this->indexTime;
-            if (
-                $this->indexState['state'] ===  IndexState::STATE_WAITING ||
-                ($this->indexState['state'] ===  IndexState::STATE_FAILED && $this->indexState['retries'] < $this->maxRetries)
-            ) {
+            if ($this->indexCanRun()) {
                 $finder = $this->getConfiguredFinder();
                 $this->indexState->setWorking($finder->count());
-
-                $this->updateIndexComplete($finder);
+                foreach ($finder as $file) {
+                    $this->indexFile($file);
+                }
                 $this->cleanUpIndex();
 
                 $this->indexState->setFinished();
             }
         } catch (\Exception $exception) {
-            $this->indexState['state'] = IndexState::STATE_FAILED;
-            $this->indexState['message'] = $exception->getMessage();
-            $this->indexState->save();
+            $this->indexState->setFailed($exception->getMessage());
             throw new \Exception($exception);
+        }
+    }
+
+    /**
+     * Performs an increment index updating files which have been modified sind the last run
+     * @throws \Exception
+     */
+    public function incrementIndexUpdate()
+    {
+        try {
+            $this->initializeIndexState();
+            $this->indexTime = new DateTime();
+            $this->indexState['last_run'] = $this->indexTime;
+            if ($this->indexCanRun()) {
+                $lastIndexedDate = $this->getLastIndexedDate();
+                $finder = $this->getConfiguredFinder();
+                //find files which have been manipulated since the last index run
+                $finder->filter(function (SplFileInfo $file) use ($lastIndexedDate){
+                   return fileatime($file->getRealPath()) > strtotime($lastIndexedDate);
+                });
+
+                $this->indexState->setWorking($finder->count());
+
+                foreach ($finder as $file) {
+                    $this->indexFile($file);
+                }
+                $this->indexState->setFinished();
+            }
+        } catch (\Exception $exception) {
+            $this->indexState->setFailed($exception->getMessage());
+            throw new \Exception($exception);
+        }
+    }
+
+    protected function indexCanRun(): bool
+    {
+        return
+            $this->indexState['state'] ===  IndexState::STATE_WAITING ||
+            (
+                $this->indexState['state'] ===  IndexState::STATE_FAILED &&
+                $this->indexState['retries'] < $this->maxRetries
+            );
+    }
+
+    protected function getLastIndexedDate(): string
+    {
+        $index = Index::query()->orderBy('last_indexed', 'desc')->first();
+        if ($index){
+            return $index['last_indexed'];
+        }else{
+            return $this->indexTime->format('Y-m-d H:i:s');
         }
     }
 
@@ -61,16 +108,6 @@ class FileIndexTask
         $this->indexState = $indexState;
         $this->indexState->save();
         $this->indexState->fresh();
-    }
-
-    /**
-     * Finds all files in the image directory and updates the index entry
-     */
-    protected function updateIndexComplete(Finder $finder)
-    {
-        foreach ($finder as $file) {
-            $this->indexFile($file);
-        }
     }
 
     protected function getConfiguredFinder(): Finder

@@ -23,18 +23,27 @@ class IndexState extends Model
 
     public function setWorking($count)
     {
-        $this->attributes['state'] = IndexState::STATE_WORKING;
-        $this->attributes['total'] = $count;
-        $this->attributes['current'] = 0;
-        $this->attributes['last_run'] = new \DateTime();
+        $this->state = IndexState::STATE_WORKING;
+        $this->total = $count;
+        $this->current = 0;
+        $this->retries = 0;
+        $this->last_run = new \DateTime();
         $this->save();
     }
 
     public function setFinished()
     {
-        $this->attributes['state'] = IndexState::STATE_WAITING;
-        $this->attributes['current'] = 0;
-        $this->attributes['total'] = 0;
+        $this->state = IndexState::STATE_WAITING;
+        $this->current = 0;
+        $this->total = 0;
+        $this->save();
+    }
+
+    public function setFailed($message)
+    {
+        $this->state = IndexState::STATE_FAILED;
+        $this->message = $message;
+        $this->retries++;
         $this->save();
     }
 }

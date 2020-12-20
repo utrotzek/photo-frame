@@ -44,8 +44,7 @@ class IndexingCommand extends Command
         if ($this->option('full')){
             $this->fileIndexTask->completeIndexUpdate();
         }else{
-            //increment
-            throw new \Exception("Not implemented");
+            $this->fileIndexTask->incrementIndexUpdate();
         }
         return 0;
     }
