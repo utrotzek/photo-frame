@@ -1,5 +1,8 @@
 <?php
 
+use App\Http\Controllers\CommandController;
+use App\Http\Controllers\IndexController;
+use App\Http\Controllers\QueueController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -18,10 +21,11 @@ Route::middleware('auth:api')->get('/user', function (Request $request) {
 });
 
 //commands
-Route::delete('/commands/clearView/{view}', [\App\Http\Controllers\CommandController::class, 'clearView']);
+Route::delete('/commands/clearView/{view}', [CommandController::class, 'clearView']);
 Route::apiResources([
-    'commands' => \App\Http\Controllers\CommandController::class
+    'commands' => CommandController::class
 ]);
 
 //index
-Route::get('/index/state', [\App\Http\Controllers\IndexController::class, 'state']);
+Route::get('/index/state', [IndexController::class, 'state']);
+Route::post('/queue/create', [QueueController::class, 'create']);
