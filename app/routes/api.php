@@ -31,3 +31,4 @@ Route::get('/index/state', [IndexController::class, 'state']);
 Route::post('/queue/create', [QueueController::class, 'create']);
 Route::get('/queue/current', [QueueController::class, 'current']);
 Route::get('/queue/nextBatch', [QueueController::class, 'nextBatch']);
+Route::get('/queue/move', [QueueController::class, 'move']);

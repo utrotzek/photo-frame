@@ -36,6 +36,23 @@ class QueueController extends Controller
         );
     }
 
+    public function move(Request $request)
+    {
+        if (!$request->has('direction')) {
+            throw new \InvalidArgumentException('Parameter \'direction\' missing');
+        }
+        $direction = $request->input('direction');
+
+        switch ($direction) {
+            case 'forward':
+                $this->queueProcessor->moveForward();
+                break;
+            case 'backward':
+                $this->queueProcessor->moveBackward();
+                break;
+        }
+    }
+
     public function create(Request $request): Response{
         if (is_null($request->input('type'))){
             return new Response('Required parameter \'type\' is given');

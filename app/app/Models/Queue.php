@@ -11,6 +11,10 @@ class Queue extends Model
     use HasFactory;
     protected $table = 'queue';
 
+    const STATE_CURRENT = 'current';
+    const STATE_QUEUED = 'queued';
+    const STATE_DONE = 'done';
+
     public function index(): BelongsTo
     {
         return $this->belongsTo(Index::class, 'index_id');
@@ -21,10 +25,18 @@ class Queue extends Model
         return $this->belongsTo(Queue::class, 'parent_id');
     }
 
-
-    public static function findCurrent(): ?Model
+    public static function findFirst(): ?Queue
     {
-        return self::query()->where('state', '=', 'current')->first();
+        /** @var Queue $queue */
+        $queue = self::query()->whereNull('parent_id')->first();
+        return $queue;
+    }
+
+    public static function findCurrent(): ?Queue
+    {
+        /** @var Queue $queue */
+        $queue = self::query()->where('state', '=', 'current')->first();
+        return $queue;
     }
 
     /**
@@ -37,7 +49,7 @@ class Queue extends Model
 
         $lastItem = $current;
         for ($i=0;$i < $limit; $i++){
-            $nextItem = self::query()->where('parent_id', '=', $lastItem->id)->first();
+            $nextItem = $lastItem->getNextItem();
 
             if ($nextItem){
                 $batch[] = $nextItem ;
@@ -45,5 +57,18 @@ class Queue extends Model
             }
         }
         return $batch;
+    }
+
+    public function getNextItem(): ?Model
+    {
+        return $this->newQuery()->where('parent_id', '=', $this->id)->first();
+    }
+
+    public function getPreviousItem(): ?Model
+    {
+        if (!is_null($this->parent_id)){
+            return $this->newQuery()->where('id', '=', $this->parent_id)->first();
+        }
+        return null;
     }
 }

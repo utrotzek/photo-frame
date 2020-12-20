@@ -20,12 +20,47 @@ class QueueProcessor
         if (!empty($toYear)) {
             $queryBuilder->where('year', '<=', $toYear);
         }
-        //TODO: order by date
+        //TODO: order by date (date is missing currently)
         $indexResult = $queryBuilder->get();
         if (!$indexResult) {
             throw new QueueGenerationException('Error while generating the queue (no index entries found)');
         }
         $this->createQueue($indexResult, $shuffle);
+    }
+
+    public function moveForward()
+    {
+        $current = Queue::findCurrent();
+        $next = $current->getNextItem();
+
+        if ($next){
+            $current['state'] = QUEUE::STATE_DONE;
+            $current->save();
+            $next['state'] = QUEUE::STATE_CURRENT;
+            $next->save();
+        }else {
+            $current['state'] = QUEUE::STATE_DONE;
+            $current->save();
+
+            $first = Queue::findFirst();
+            $first['state'] = QUEUE::STATE_CURRENT;
+            $first->save();
+        }
+
+
+    }
+
+    public function moveBackward()
+    {
+        $current = Queue::findCurrent();
+        $previous = $current->getPreviousItem();
+
+        if ($previous){
+            $current['state'] = QUEUE::STATE_QUEUED;
+            $current->save();
+            $previous['state'] = QUEUE::STATE_CURRENT;
+            $previous->save();
+        }
     }
 
     /**
@@ -57,4 +92,5 @@ class QueueProcessor
             $lastItem = $queue;
         }
     }
+
 }
