@@ -28,7 +28,7 @@
 export default {
     data () {
         return {
-            batchSize: 3,
+            batchSize: 2,
             active:  0,
             pollCommandsInterval: null,
             slideshowInterval: null,
@@ -122,10 +122,15 @@ export default {
                 });
         },
         garbageCollection () {
-            const activeIndex = this.images.map(function(x) {return x.active; }).indexOf(true);
-
-            if (activeIndex >= this.batchSize * 3) {
-                this.images.splice(0, this.batchSize*2);
+            let activeImageCount=0;
+            for (let i=0; i < this.images.length; i++) {
+                if (this.images[i].active){
+                    activeImageCount=i+1;
+                }
+            }
+            console.log(activeImageCount + "== " + this.batchSize * 2);
+            if ((activeImageCount) >= this.batchSize * 2) {
+                this.images.splice(0, this.batchSize*2-1);
             }
         },
         setIntervals () {
@@ -184,18 +189,23 @@ export default {
         triggerSlideshow: function(){
             this.enableTransition = true;
             if (!this.pause && !this.waitForExecution) {
-                this.next();
-                this.garbageCollection();
+                this.next()
+                    .then(res => {
+                        this.garbageCollection();
+                    })
             }
         },
         togglePause: function(){
             this.pause=!this.pause;
         },
         next: function() {
-            axios.put('/api/queue/move', {direction: 'forward'})
-                 .then(res => {
-                    this.loadCurrentImage()
-                 });
+            return new Promise((resolve, reject) => {
+                axios.put('/api/queue/move', {direction: 'forward'})
+                     .then(res => {
+                        this.loadCurrentImage()
+                        resolve()
+                     });
+            });
         },
         prev: function() {
             axios.put('/api/queue/move', {direction: 'backward'})
