@@ -36,6 +36,7 @@ RUN add-apt-repository ppa:ondrej/php && \
         php${PHP_VERSION}-ctype \
         php${PHP_VERSION}-bcmath \
         php${PHP_VERSION}-xdebug \
+        php${PHP_VERSION}-sqlite \
         libapache2-mod-php
 
 RUN a2dissite 000-default
@@ -52,6 +53,9 @@ ENV APACHE_RUN_GROUP=$USER_NAME
 RUN chown -R $USER_NAME:$USER_NAME /var/log/apache2*
 RUN chown -R $USER_NAME:$USER_NAME /var/lock/apache2*
 RUN chown -R $USER_NAME:$USER_NAME /var/run/apache2*
+
+RUN mkdir -p /var/database/ && \
+    chown $USER_NAME:$USER_NAME /var/database/
 USER $USER_NAME
 
 # forward request and error logs to docker log collector
