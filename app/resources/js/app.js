@@ -8,9 +8,12 @@ require('./bootstrap');
 
 window.Vue = require('vue');
 
+//Register vue.js plugins
 import VueRouter from 'vue-router'
+import VueEllipseProgress from 'vue-ellipse-progress';
 
 Vue.use(VueRouter)
+Vue.use(VueEllipseProgress);
 
 /**
  * The following block of code may be used to automatically register your
