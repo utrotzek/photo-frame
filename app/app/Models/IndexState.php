@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Carbon\Carbon;
 use DateTime;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -22,13 +23,17 @@ class IndexState extends Model
         'last_run',
     ];
 
+    protected $casts = [
+        'last_run' => 'datetime'
+    ];
+
     public function setWorking($count)
     {
         $this->state = IndexState::STATE_WORKING;
         $this->total = $count;
         $this->current = 0;
         $this->retries = 0;
-        $this->last_run = new DateTime();
+        $this->last_run = new Carbon();
         $this->save();
     }
 
@@ -47,5 +52,14 @@ class IndexState extends Model
         $this->message = $message;
         $this->retries++;
         $this->save();
+    }
+
+    public function getPercentage(): float
+    {
+        if ($this->total > 0) {
+            return round($this->current / $this->total * 100, 2);
+        } else {
+          return 0.00;
+        }
     }
 }

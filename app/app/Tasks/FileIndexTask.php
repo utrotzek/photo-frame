@@ -58,11 +58,11 @@ class FileIndexTask
     {
         try {
             $this->initializeIndexState();
-            if ($this->indexCanRun()) {
+            if (true) {
                 $finder = $this->getConfiguredFinder();
                 //find files which have been manipulated since the last index run
                 $finder->filter(function (SplFileInfo $file){
-                   return fileatime($file->getRealPath()) > strtotime($this->indexState['last_run']);
+                   return fileatime($file->getRealPath()) > strtotime($this->indexState['last_run']->format('d.m.Y H:i:s'));
                 });
 
                 $this->indexState->setWorking($finder->count());
