@@ -2,6 +2,7 @@
 
 namespace App\Console\Commands;
 
+use App\Models\IndexState;
 use App\Tasks\FileIndexTask;
 use Illuminate\Console\Command;
 
@@ -12,7 +13,7 @@ class IndexingCommand extends Command
      *
      * @var string
      */
-    protected $signature = 'index:execute {--full}';
+    protected $signature = 'index:execute {--full} {--increment} {--check-queue}';
 
     /**
      * The console command description.
@@ -41,10 +42,17 @@ class IndexingCommand extends Command
      */
     public function handle()
     {
-        if ($this->option('full')){
+        if ($this->option('check-queue')) {
+            $indexState = IndexState::query()->findOrFail(1)->first();
+            if ($indexState['state'] === IndexState::STATE_TRIGGERED) {
+                $this->fileIndexTask->completeIndexUpdate();
+            }
+        } elseif ($this->option('full')) {
             $this->fileIndexTask->completeIndexUpdate();
-        }else{
+        } elseif ($this->option('incremenct')) {
             $this->fileIndexTask->incrementIndexUpdate();
+        } else {
+            throw new \InvalidArgumentException('no option provided');
         }
         return 0;
     }

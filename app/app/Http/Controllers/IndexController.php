@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Resources\IndexState as IndexStateResource;
 use App\Models\IndexState;
+use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 
 class IndexController extends Controller
@@ -22,6 +23,21 @@ class IndexController extends Controller
             $state = new IndexState(['state' => 'waiting']);
             $state->save();
             return new Response($state->fresh());
+        }
+    }
+
+    public function update(Request $request ) {
+        switch($request->input('state')){
+            case IndexState::STATE_TRIGGERED:
+            case IndexState::STATE_ABORT:
+                $indexState = IndexState::query()->findOrFail(1)->first();
+                if ($indexState['state'] === IndexState::STATE_WAITING || $indexState['state'] === IndexState::STATE_FAILED) {
+                    $indexState['state'] = $request->input('state');
+                    $indexState->save();
+                }
+                break;
+            default:
+                throw new \InvalidArgumentException('state not allowed');
         }
     }
 }

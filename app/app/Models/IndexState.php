@@ -12,8 +12,11 @@ class IndexState extends Model
     use HasFactory;
 
     const STATE_WAITING = 'waiting';
+    const STATE_STARTING = 'starting';
     const STATE_WORKING = 'working';
     const STATE_FAILED = 'failed';
+    const STATE_TRIGGERED = 'triggered';
+    const STATE_ABORT = 'abort';
 
     protected $fillable = [
         'state',
@@ -27,13 +30,24 @@ class IndexState extends Model
         'last_run' => 'datetime'
     ];
 
+    public function setStarting()
+    {
+        $this->state = IndexState::STATE_STARTING;
+        $this->total = 0;
+        $this->current = 0;
+        $this->retries = 0;
+        $this->message = '';
+        $this->last_run = new Carbon();
+        $this->save();
+    }
+
+
     public function setWorking($count)
     {
         $this->state = IndexState::STATE_WORKING;
         $this->total = $count;
         $this->current = 0;
         $this->retries = 0;
-        $this->last_run = new Carbon();
         $this->save();
     }
 

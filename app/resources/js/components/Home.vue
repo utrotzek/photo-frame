@@ -36,10 +36,10 @@
                                     <vue-ellipse-progress
                                         :progress="index.percent"
                                         :color="progressBar.color"
-                                        :loading="progressBar.noData"
-                                        :animation="progressBar.animation"
+                                        :loading="progressBar.loading"
                                         :dot="progressBar.dot"
                                         :size="100"
+                                        animation="rs 2500"
                                     >
                                         <span slot="legend-value">%</span>
                                         <p slot="legend-caption">{{ index.message }}</p>
@@ -49,7 +49,8 @@
                         </div>
                         <button
                             class="btn btn-primary mt-auto"
-                            :disabled="index.state === 'working' || index.state === 'loading'"
+                            :disabled="index.state !== 'waiting' && index.state !== 'failed'"
+                            @click="setTriggered()"
                         >
                             Indexierung starten <i class="las la-caret-right"></i>
                         </button>
@@ -64,22 +65,22 @@
 export default {
     data () {
         return {
-            progress: 100000,
             colors: {
+                startedColor: '#2a9fd6',
                 waitingColor: '#77b300',
                 workingColor: '#fd7e14',
-                triggeredColor: '#e9ecef'
+                triggeredColor: '#e9ecef',
+                failedColor: '#c00'
             },
             progressBar: {
                 color: '#77b300',
-                noData: true,
-                dot: '',
-                animation: 'bounce 1000 1000'
+                loading: true,
+                dot: '10',
             },
             index: {
                 state: 'loading',
                 percent: 100,
-                message: 'Warte',
+                message: '',
                 strokeColor: '#77b300',
             },
             indexStatusInterval: null,
@@ -89,8 +90,8 @@ export default {
     components: {
     },
     mounted() {
+        this.setDot();
         this.setReload(1000);
-        this.progressBar.dot = '10% '+ this.colors.workingColor;
     },
     methods: {
         setReload(time) {
@@ -99,6 +100,9 @@ export default {
                 clearInterval(this.indexStatusInterval);
                 this.indexStatusInterval = setInterval(() => this.pollIndex(), time);
             }
+        },
+        setDot() {
+            this.progressBar.dot = '10% '+ this.progressBar.color;
         },
         pollIndex() {
             axios.get('/api/index/state')
@@ -110,26 +114,71 @@ export default {
                          case 'working':
                              this.setModeWorking(res.data.percentage);
                              break;
+                         case 'triggered':
+                             this.setModeTriggered();
+                             break;
+                         case 'failed':
+                             this.setModeFailed();
+                             break;
+                         case 'starting':
+                             this.setModeStarting();
+                             break;
                      }
-                     this.progressBar.noData = false;
+                     this.setDot();
                  })
+        },
+        setTriggered() {
+            axios.put('/api/index/update', {state: 'triggered'});
         },
         setModeWaiting() {
             this.setReload(2000);
             this.progressBar.color = this.colors.waitingColor;
+            this.progressBar.loading = false;
             this.index = {
                 state: 'waiting',
                 percent: 100,
-                message: 'Warte'
+                message: 'Beendet'
             };
         },
         setModeWorking($percentage) {
             this.progressBar.color = this.colors.workingColor;
+            this.progressBar.loading = false;
             this.setReload(1000);
             this.index = {
                 state: 'working',
                 percent: $percentage,
                 message: 'Indexierung'
+            };
+        },
+        setModeTriggered() {
+            this.progressBar.color = this.colors.waitingColor;
+            this.progressBar.loading = true;
+            this.setReload(1000);
+            this.index = {
+                state: 'triggered',
+                percent: 100,
+                message: 'Wird gestartet'
+            };
+        },
+        setModeStarting() {
+            this.progressBar.color = this.colors.startedColor;
+            this.progressBar.loading = true;
+            this.setReload(1000);
+            this.index = {
+                state: 'starting',
+                percent: 0,
+                message: 'gestartet'
+            };
+            this.progressBar.loading = true;
+        },
+        setModeFailed() {
+            this.progressBar.color = this.colors.failedColor;
+            this.progressBar.loading = false;
+            this.setReload(2000);
+            this.index = {
+                state: 'failed',
+                percent: 100,
+                message: 'Fehler'
             };
         }
     }

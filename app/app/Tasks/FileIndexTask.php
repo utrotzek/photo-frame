@@ -35,8 +35,10 @@ class FileIndexTask
         try {
             $this->initializeIndexState();
             if ($this->indexCanRun()) {
+                $this->indexState->setStarting();
                 $finder = $this->getConfiguredFinder();
-                $this->indexState->setWorking($finder->count());
+                $count = $finder->count();
+                $this->indexState->setWorking($count);
                 foreach ($finder as $file) {
                     $this->indexFile($file);
                 }
@@ -58,14 +60,16 @@ class FileIndexTask
     {
         try {
             $this->initializeIndexState();
-            if (true) {
+            if ($this->indexCanRun()) {
                 $finder = $this->getConfiguredFinder();
                 //find files which have been manipulated since the last index run
                 $finder->filter(function (SplFileInfo $file){
                    return fileatime($file->getRealPath()) > strtotime($this->indexState['last_run']->format('d.m.Y H:i:s'));
                 });
 
-                $this->indexState->setWorking($finder->count());
+                $this->indexState->setStarting();
+                $count = $finder->count();
+                $this->indexState->setWorking($count);
 
                 foreach ($finder as $file) {
                     $this->indexFile($file);
@@ -81,7 +85,7 @@ class FileIndexTask
     protected function indexCanRun(): bool
     {
         return
-            $this->indexState['state'] ===  IndexState::STATE_WAITING ||
+            $this->indexState['state'] !==  IndexState::STATE_WORKING ||
             (
                 $this->indexState['state'] ===  IndexState::STATE_FAILED &&
                 $this->indexState['retries'] < $this->maxRetries

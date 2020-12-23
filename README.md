@@ -20,4 +20,4 @@ Uses the line-awesome icon library. Docs are availble on [github]((https://githu
 You can [search here](https://icons8.com/line-awesome) for icons.
 
 ## Progress bar
-This project uses the easy circular progress bar. The documentation can be found here: [docs](https://vuejsexamples.com/easy-circular-progress-component-with-counting-effect/)
+This project uses vue ellipse progress bar. The documentation can be found here: [docs](https://github.com/setaman/vue-ellipse-progress#installation)
