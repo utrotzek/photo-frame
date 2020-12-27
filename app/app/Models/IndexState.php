@@ -71,7 +71,8 @@ class IndexState extends Model
     public function getPercentage(): float
     {
         if ($this->total > 0) {
-            return round($this->current / $this->total * 100, 2);
+            $rounded = round($this->current / $this->total * 100, 2);
+            return number_format($rounded, 2);
         } else {
           return 0.00;
         }
