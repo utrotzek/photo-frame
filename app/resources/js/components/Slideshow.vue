@@ -175,12 +175,11 @@ export default {
                         break;
                     case "pause":
                         this.commandInfo.pause = true;
-                        this.togglePause();
+                        this.setPause(true);
                         break;
                     case "play":
                         this.commandInfo.play = true;
-                        this.togglePause();
-                        this.setIntervals();
+                        this.setPause(false);
                         break;
                 }
             }
@@ -195,8 +194,8 @@ export default {
                     })
             }
         },
-        togglePause: function(){
-            this.pause=!this.pause;
+        setPause(enabled) {
+            this.pause = enabled;
         },
         next: function() {
             return new Promise((resolve, reject) => {
