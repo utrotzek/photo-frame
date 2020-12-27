@@ -12,6 +12,8 @@ elif [ "$role" = "queue" ]; then
     echo "Queue role"
     exit 1
 elif [ "$role" = "scheduler" ]; then
+    php /var/www/html/app/artisan index:execute --start-queue-worker &
+
     while [ true ]
     do
       php /var/www/html/app/artisan schedule:run --verbose --no-interaction &

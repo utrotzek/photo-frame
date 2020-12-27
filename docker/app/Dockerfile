@@ -61,6 +61,7 @@ RUN ln -sf /dev/stdout /var/log/apache2/access.log && \
 RUN mkdir -p /var/database/ && \
     chown $USER_NAME:$USER_NAME /var/database/
 USER $USER_NAME
+WORKDIR /var/www/html/app
 
 
 COPY resources/start.sh /usr/bin/local/start.sh

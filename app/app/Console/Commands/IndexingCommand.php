@@ -13,7 +13,7 @@ class IndexingCommand extends Command
      *
      * @var string
      */
-    protected $signature = 'index:execute {--full} {--increment} {--check-queue}';
+    protected $signature = 'index:execute {--full} {--increment} {--start-queue-worker}';
 
     /**
      * The console command description.
@@ -42,11 +42,8 @@ class IndexingCommand extends Command
      */
     public function handle()
     {
-        if ($this->option('check-queue')) {
-            $indexState = IndexState::query()->findOrFail(1)->first();
-            if ($indexState['state'] === IndexState::STATE_TRIGGERED) {
-                $this->fileIndexTask->completeIndexUpdate();
-            }
+        if ($this->option('start-queue-worker')) {
+            $this->executeQueueHandler();
         } elseif ($this->option('full')) {
             $this->fileIndexTask->completeIndexUpdate();
         } elseif ($this->option('incremenct')) {
@@ -55,5 +52,16 @@ class IndexingCommand extends Command
             throw new \InvalidArgumentException('no option provided');
         }
         return 0;
+    }
+
+    private function executeQueueHandler() {
+        print_r('queue worker started'. PHP_EOL);
+        do {
+            $indexState = IndexState::query()->findOrFail(1)->first();
+            if ($indexState['state'] === IndexState::STATE_TRIGGERED) {
+                $this->fileIndexTask->completeIndexUpdate();
+            }
+            sleep(5);
+        } while (true);
     }
 }
