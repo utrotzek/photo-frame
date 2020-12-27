@@ -33,7 +33,7 @@ export default {
             pollCommandsInterval: null,
             slideshowInterval: null,
             pause: false,
-            waitForExecution: false,
+            commandsProcessing: false,
             enableTransition: true,
             commandInfo: {
                 pause: false,
@@ -146,15 +146,15 @@ export default {
             this.commandInfo.play = false;
         },
         pollCommands: function() {
-            if (!this.waitForExecution){
+            if (!this.commandsProcessing){
+                this.commandsProcessing = true;
                 axios.get('/api/commands?view=Slideshow')
                     .then(res => {
                         if (res.data.length > 0) {
-                            this.waitForExecution = true;
                             this.executeCommands(res.data);
                             axios.delete('/api/commands/clearView/Slideshow');
-                            this.waitForExecution = false;
                         }
+                        this.commandsProcessing = false;
                         this.commands = [];
                     });
                 this.disableCommandInfos();
@@ -188,7 +188,7 @@ export default {
         },
         triggerSlideshow: function(){
             this.enableTransition = true;
-            if (!this.pause && !this.waitForExecution) {
+            if (!this.pause && !this.commandsProcessing) {
                 this.next()
                     .then(res => {
                         this.garbageCollection();
