@@ -28,7 +28,7 @@
 export default {
     data () {
         return {
-            batchSize: 2,
+            batchSize: 5,
             active:  0,
             pollCommandsInterval: null,
             slideshowInterval: null,
@@ -86,6 +86,8 @@ export default {
                             active: true
                         };
                         this.images.push(newImage)
+                        this.loadNextBatch();
+                        this.loadPreviousBatch();
                     }
                 })
         },
