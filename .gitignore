@@ -1,3 +1,4 @@
 .env
-data/database/*.sqlite*
 .idea
+data/database/**
+!data/database/.gitkeep
