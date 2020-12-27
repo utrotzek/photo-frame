@@ -24,14 +24,14 @@
                     <h5 class="card-header" ><i class="las la-clipboard-list"></i> Bilder Index</h5>
                     <div class="card-body d-flex flex-column justify-content-center">
                         <div class="row">
-                            <div class="col-8">
+                            <div class="col-7">
                                 <ul class="info-list">
                                     <li>Aktuell befinden sich <b>3.020</b> Bilder im Index.</li>
                                     <li>Das neueste Bild wurde am <b>20.12.2020</b> aufgenomen.</li>
                                     <li>Das älteste Bild ist vom <b>01.01.1994.</b></li>
                                 </ul>
                             </div>
-                            <div class="col-4">
+                            <div class="col-5">
                                 <div class="progress-bar-wrapper mb-2">
                                     <vue-ellipse-progress
                                         :progress="index.percent"
