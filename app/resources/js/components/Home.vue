@@ -38,21 +38,31 @@
                                         :color="progressBar.color"
                                         :loading="progressBar.loading"
                                         :dot="progressBar.dot"
-                                        :size="100"
+                                        :size="110"
                                         :animation="progressBar.animation"
                                     >
                                         <span slot="legend-value">%</span>
-                                        <p slot="legend-caption">{{ index.message }}</p>
+
+                                        <p slot="legend-caption">
+                                            {{ index.message }}<br />
+                                        </p>
                                     </vue-ellipse-progress>
                                 </div>
                             </div>
                         </div>
                         <button
                             class="btn btn-primary mt-auto"
-                            :disabled="index.state !== 'waiting' && index.state !== 'failed'"
                             @click="setTriggered()"
+                            v-if="index.state !== 'working' && index.state !== 'triggered' && index.state !== 'starting'"
                         >
                             Indexierung starten <i class="las la-caret-right"></i>
+                        </button>
+                        <button
+                            class="btn btn-danger"
+                            v-else
+                            @click="setAborted()"
+                        >
+                            Abbrechen <i class="lar la-times-circle"></i>
                         </button>
                     </div>
                 </div>
@@ -70,17 +80,19 @@ export default {
                 waitingColor: '#77b300',
                 workingColor: '#fd7e14',
                 triggeredColor: '#e9ecef',
-                failedColor: '#c00'
+                failedColor: '#c00',
+                abortColor: '#adafae'
             },
             animation: {
-                quick: 'rs 100',
-                slow: 'rs 2500'
+                quick: 'default 100',
+                slow: 'default 2500'
             },
             progressBar: {
                 color: '#77b300',
                 loading: true,
                 dot: '10',
-                animation: 'rs 100'
+                animation: 'default 100',
+                slowDownOnNextTick: false
             },
             index: {
                 state: 'loading',
@@ -111,6 +123,10 @@ export default {
             this.progressBar.dot = '10% '+ this.progressBar.color;
         },
         pollIndex() {
+            if (this.progressBar.slowDownOnNextTick){
+                this.progressBar.animation = this.animation.slow;
+                this.progressBar.slowDownOnNextTick = false;
+            }
             axios.get('/api/index/state')
                  .then(res => {
                      switch (res.data.state) {
@@ -129,12 +145,18 @@ export default {
                          case 'starting':
                              this.setModeStarting();
                              break;
+                         case 'abort':
+                             this.setModeAbort(res.data.percentage);
+                             break;
                      }
                      this.setDot();
                  })
         },
         setTriggered() {
             axios.put('/api/index/update', {state: 'triggered'});
+        },
+        setAborted() {
+            axios.put('/api/index/update', {state: 'abort'});
         },
         setModeWaiting() {
             this.setReload(2000);
@@ -150,7 +172,7 @@ export default {
         setModeWorking($percentage) {
             this.progressBar.color = this.colors.workingColor;
             this.progressBar.loading = false;
-            this.progressBar.animation = this.animation.slow;
+            this.progressBar.slowDownOnNextTick = true;
             this.setReload(1000);
             this.index = {
                 state: 'working',
@@ -180,6 +202,18 @@ export default {
                 message: 'gestartet'
             };
             this.progressBar.loading = true;
+        },
+        setModeAbort(percentage) {
+            this.progressBar.color = this.colors.abortColor;
+            this.progressBar.loading = false;
+            this.setReload(1000);
+            this.progressBar.animation = this.animation.quick;
+            this.index = {
+                state: 'abort',
+                percent: percentage,
+                message: 'abgebrochen'
+            };
+            this.progressBar.loading = false;
         },
         setModeFailed() {
             this.progressBar.color = this.colors.failedColor;

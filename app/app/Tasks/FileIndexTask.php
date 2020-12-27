@@ -4,6 +4,7 @@
 namespace App\Tasks;
 
 
+use App\Exceptions\AbortIndexingException;
 use App\Models\IndexState;
 use App\Models\Index;
 use DateTime;
@@ -38,14 +39,15 @@ class FileIndexTask
                 $this->indexState->setStarting();
                 $finder = $this->getConfiguredFinder();
                 $count = $finder->count();
+                $this->checkForAbort();
                 $this->indexState->setWorking($count);
-                foreach ($finder as $file) {
-                    $this->indexFile($file);
-                }
+                $this->processFiles($finder);
                 $this->cleanUpIndex();
 
                 $this->indexState->setFinished($this->indexTime);
             }
+        } catch (AbortIndexingException $exception) {
+            //do nothing
         } catch (\Exception $exception) {
             $this->indexState->setFailed($exception->getMessage());
             throw new \Exception($exception);
@@ -69,13 +71,13 @@ class FileIndexTask
 
                 $this->indexState->setStarting();
                 $count = $finder->count();
+                $this->checkForAbort();
                 $this->indexState->setWorking($count);
-
-                foreach ($finder as $file) {
-                    $this->indexFile($file);
-                }
+                $this->processFiles($finder);
                 $this->indexState->setFinished($this->indexTime);
             }
+        } catch (AbortIndexingException $exception) {
+            //do nothing
         } catch (\Exception $exception) {
             $this->indexState->setFailed($exception->getMessage());
             throw new \Exception($exception);
@@ -90,6 +92,31 @@ class FileIndexTask
                 $this->indexState['state'] ===  IndexState::STATE_FAILED &&
                 $this->indexState['retries'] < $this->maxRetries
             );
+    }
+
+    /**
+     * @throws AbortIndexingException
+     */
+    protected function processFiles(Finder $finder) {
+        $abortCheckCounter = 0;
+
+        $this->checkForAbort();
+        foreach ($finder as $file) {
+            $this->indexFile($file);
+
+            if ($abortCheckCounter === 100){
+                //check for abort state very 100 indexed files
+                $this->checkForAbort();
+                $abortCheckCounter = 0;
+            }
+            $abortCheckCounter++;
+        }
+    }
+
+    protected function checkForAbort() {
+        if (IndexState::isAborted()) {
+            throw new AbortIndexingException;
+        }
     }
 
     /**

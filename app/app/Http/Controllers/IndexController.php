@@ -21,14 +21,15 @@ class IndexController extends Controller
     }
 
     public function update(Request $request ) {
+        /** @var IndexState $indexState */
+        $indexState = IndexState::query()->findOrFail(1)->first();
+
         switch($request->input('state')){
             case IndexState::STATE_TRIGGERED:
+                $indexState->setTriggered();
+                break;
             case IndexState::STATE_ABORT:
-                $indexState = IndexState::query()->findOrFail(1)->first();
-                if ($indexState['state'] === IndexState::STATE_WAITING || $indexState['state'] === IndexState::STATE_FAILED) {
-                    $indexState['state'] = $request->input('state');
-                    $indexState->save();
-                }
+                $indexState->setAbort();
                 break;
             default:
                 throw new \InvalidArgumentException('state not allowed');

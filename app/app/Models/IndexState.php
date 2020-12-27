@@ -30,6 +30,23 @@ class IndexState extends Model
         'last_run' => 'datetime'
     ];
 
+    public function setTriggered()
+    {
+        $this->state = IndexState::STATE_TRIGGERED;
+        $this->total = 0;
+        $this->current = 0;
+        $this->retries = 0;
+        $this->message = '';
+        $this->save();
+    }
+
+    public function setAbort()
+    {
+        $this->state = IndexState::STATE_ABORT;
+        $this->message = 'Indexierung abgebrochen';
+        $this->save();
+    }
+
     public function setStarting()
     {
         $this->state = IndexState::STATE_STARTING;
@@ -76,5 +93,11 @@ class IndexState extends Model
         } else {
           return 0.00;
         }
+    }
+
+    public static function isAborted(): bool
+    {
+        $indexState = IndexState::query()->findOrFail(1)->first();
+        return ($indexState['state'] === self::STATE_ABORT);
     }
 }
