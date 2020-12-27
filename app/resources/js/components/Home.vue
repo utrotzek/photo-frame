@@ -39,7 +39,7 @@
                                         :loading="progressBar.loading"
                                         :dot="progressBar.dot"
                                         :size="100"
-                                        animation="rs 2500"
+                                        :animation="progressBar.animation"
                                     >
                                         <span slot="legend-value">%</span>
                                         <p slot="legend-caption">{{ index.message }}</p>
@@ -72,10 +72,15 @@ export default {
                 triggeredColor: '#e9ecef',
                 failedColor: '#c00'
             },
+            animation: {
+                quick: 'rs 100',
+                slow: 'rs 2500'
+            },
             progressBar: {
                 color: '#77b300',
                 loading: true,
                 dot: '10',
+                animation: 'rs 100'
             },
             index: {
                 state: 'loading',
@@ -90,6 +95,7 @@ export default {
     components: {
     },
     mounted() {
+        this.progressBar.animation = this.animation.quick;
         this.setDot();
         this.setReload(1000);
     },
@@ -134,6 +140,7 @@ export default {
             this.setReload(2000);
             this.progressBar.color = this.colors.waitingColor;
             this.progressBar.loading = false;
+            this.progressBar.animation = this.animation.quick;
             this.index = {
                 state: 'waiting',
                 percent: 100,
@@ -143,6 +150,7 @@ export default {
         setModeWorking($percentage) {
             this.progressBar.color = this.colors.workingColor;
             this.progressBar.loading = false;
+            this.progressBar.animation = this.animation.slow;
             this.setReload(1000);
             this.index = {
                 state: 'working',
@@ -153,6 +161,7 @@ export default {
         setModeTriggered() {
             this.progressBar.color = this.colors.waitingColor;
             this.progressBar.loading = true;
+            this.progressBar.animation = this.animation.quick;
             this.setReload(1000);
             this.index = {
                 state: 'triggered',
@@ -164,6 +173,7 @@ export default {
             this.progressBar.color = this.colors.startedColor;
             this.progressBar.loading = true;
             this.setReload(1000);
+            this.progressBar.animation = this.animation.quick;
             this.index = {
                 state: 'starting',
                 percent: 0,
@@ -175,6 +185,7 @@ export default {
             this.progressBar.color = this.colors.failedColor;
             this.progressBar.loading = false;
             this.setReload(2000);
+            this.progressBar.animation = this.animation.quick;
             this.index = {
                 state: 'failed',
                 percent: 100,
