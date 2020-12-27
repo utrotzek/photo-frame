@@ -2,6 +2,7 @@
 
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 
 class CreateIndexStates extends Migration
@@ -23,6 +24,12 @@ class CreateIndexStates extends Migration
             $table->dateTime('last_run')->useCurrent();
             $table->timestamps();
         });
+
+        DB::table('index_states')->insert(
+            [
+                'state' => \App\Models\IndexState::STATE_WAITING,
+            ]
+        );
     }
 
     /**
