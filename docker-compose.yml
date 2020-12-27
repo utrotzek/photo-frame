@@ -16,10 +16,8 @@ services:
     volumes:
       - ./app:/var/www/html/app
       - /mnt/nas:/var/images
-      - photo-frame:/var/database/
+      - ./data/database/:/var/database/
     working_dir: /var/www/html/app
     ports:
     - "8080:8080"
     - "443:8443"
-volumes:
-  photo-frame:
