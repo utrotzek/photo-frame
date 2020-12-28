@@ -34,7 +34,7 @@
                             <div class="col-5">
                                 <div class="progress-bar-wrapper mb-2">
                                     <vue-ellipse-progress
-                                        :progress="index.percent"
+                                        :progress="indexState.percent"
                                         :color="progressBar.color"
                                         :loading="progressBar.loading"
                                         :dot="progressBar.dot"
@@ -44,7 +44,7 @@
                                         <span slot="legend-value">%</span>
 
                                         <p slot="legend-caption">
-                                            {{ index.message }}<br />
+                                            {{ indexState.message }}<br />
                                         </p>
                                     </vue-ellipse-progress>
                                 </div>
@@ -53,7 +53,7 @@
                         <button
                             class="btn btn-primary mt-auto"
                             @click="setTriggered()"
-                            v-if="index.state !== 'working' && index.state !== 'triggered' && index.state !== 'starting'"
+                            v-if="indexState.state !== 'working' && indexState.state !== 'triggered' && indexState.state !== 'starting'"
                         >
                             Indexierung starten <i class="las la-caret-right"></i>
                         </button>
@@ -94,7 +94,7 @@ export default {
                 animation: 'default 100',
                 slowDownOnNextTick: false
             },
-            index: {
+            indexState: {
                 state: 'loading',
                 percent: 100,
                 message: '',
@@ -163,7 +163,7 @@ export default {
             this.progressBar.color = this.colors.waitingColor;
             this.progressBar.loading = false;
             this.progressBar.animation = this.animation.quick;
-            this.index = {
+            this.indexState = {
                 state: 'waiting',
                 percent: 100,
                 message: 'Beendet'
@@ -174,7 +174,7 @@ export default {
             this.progressBar.loading = false;
             this.progressBar.slowDownOnNextTick = true;
             this.setReload(1000);
-            this.index = {
+            this.indexState = {
                 state: 'working',
                 percent: $percentage,
                 message: 'Indexierung'
@@ -185,7 +185,7 @@ export default {
             this.progressBar.loading = true;
             this.progressBar.animation = this.animation.quick;
             this.setReload(1000);
-            this.index = {
+            this.indexState = {
                 state: 'triggered',
                 percent: 100,
                 message: 'Wird gestartet'
@@ -196,7 +196,7 @@ export default {
             this.progressBar.loading = true;
             this.setReload(1000);
             this.progressBar.animation = this.animation.quick;
-            this.index = {
+            this.indexState = {
                 state: 'starting',
                 percent: 0,
                 message: 'gestartet'
@@ -208,7 +208,7 @@ export default {
             this.progressBar.loading = false;
             this.setReload(1000);
             this.progressBar.animation = this.animation.quick;
-            this.index = {
+            this.indexState = {
                 state: 'abort',
                 percent: percentage,
                 message: 'abgebrochen'
@@ -220,7 +220,7 @@ export default {
             this.progressBar.loading = false;
             this.setReload(2000);
             this.progressBar.animation = this.animation.quick;
-            this.index = {
+            this.indexState = {
                 state: 'failed',
                 percent: 100,
                 message: 'Fehler'
