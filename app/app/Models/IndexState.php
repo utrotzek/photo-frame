@@ -30,6 +30,14 @@ class IndexState extends Model
         'last_run' => 'datetime'
     ];
 
+    /**
+     * Returns the current index state
+     */
+    public static function getCurrent(): IndexState
+    {
+        return self::query()->findOrFail(1)->first();
+    }
+
     public function setTriggered()
     {
         $this->state = IndexState::STATE_TRIGGERED;
