@@ -46,7 +46,7 @@ class IndexingCommand extends Command
             $this->executeQueueHandler();
         } elseif ($this->option('full')) {
             $this->fileIndexTask->completeIndexUpdate();
-        } elseif ($this->option('incremenct')) {
+        } elseif ($this->option('increment')) {
             $this->fileIndexTask->incrementIndexUpdate();
         } else {
             throw new \InvalidArgumentException('no option provided');

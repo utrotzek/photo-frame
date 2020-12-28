@@ -68,8 +68,10 @@ class FileIndexTask
                 $this->indexState->setStarting();
                 $count = $finder->count();
                 $this->checkForAbort();
-                $this->indexState->setWorking($count);
-                $this->processFiles($finder);
+                if ($count > 0){
+                    $this->indexState->setWorking($count);
+                    $this->processFiles($finder);
+                }
 
                 if ($fullIndex) {
                     $this->cleanUpIndex();
