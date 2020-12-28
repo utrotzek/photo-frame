@@ -3,7 +3,7 @@
 namespace App\Console\Commands;
 
 use App\Models\IndexState;
-use App\Tasks\FileIndexTask;
+use App\Processor\IndexProcessor;
 use Illuminate\Console\Command;
 
 class IndexingCommand extends Command
@@ -22,17 +22,17 @@ class IndexingCommand extends Command
      */
     protected $description = 'Indexes files';
 
-    protected FileIndexTask $fileIndexTask;
+    protected IndexProcessor $indexProcessor;
 
     /**
      * Create a new command instance.
      *
      * @return void
      */
-    public function __construct(FileIndexTask $fileIndexTask)
+    public function __construct(IndexProcessor $indexProcessor)
     {
         parent::__construct();
-        $this->fileIndexTask = $fileIndexTask;
+        $this->indexProcessor = $indexProcessor;
     }
 
     /**
@@ -45,9 +45,9 @@ class IndexingCommand extends Command
         if ($this->option('start-queue-worker')) {
             $this->executeQueueHandler();
         } elseif ($this->option('full')) {
-            $this->fileIndexTask->completeIndexUpdate();
+            $this->indexProcessor->completeIndexUpdate();
         } elseif ($this->option('increment')) {
-            $this->fileIndexTask->incrementIndexUpdate();
+            $this->indexProcessor->incrementIndexUpdate();
         } else {
             throw new \InvalidArgumentException('no option provided');
         }
@@ -59,7 +59,7 @@ class IndexingCommand extends Command
         do {
             $indexState = IndexState::query()->findOrFail(1)->first();
             if ($indexState['state'] === IndexState::STATE_TRIGGERED) {
-                $this->fileIndexTask->completeIndexUpdate();
+                $this->indexProcessor->completeIndexUpdate();
             }
             sleep(5);
         } while (true);

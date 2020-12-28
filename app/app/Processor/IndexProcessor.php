@@ -1,8 +1,5 @@
 <?php
-
-
-namespace App\Tasks;
-
+namespace App\Processor;
 
 use App\Exceptions\AbortIndexingException;
 use App\Models\IndexState;
@@ -11,7 +8,7 @@ use DateTime;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\Finder\SplFileInfo;
 
-class FileIndexTask
+class IndexProcessor
 {
     protected $indexFileExtensions = ['*.JPG', '*.jpg', '*.JPEG', '*.png', '*.PNG'];
     protected $excludedDirectories = ['Handy upload', 'Unsortiert'];
