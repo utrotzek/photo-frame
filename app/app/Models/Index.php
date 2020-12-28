@@ -17,7 +17,13 @@ class Index extends Model
         'year' ,
         'month' ,
         'base_name',
-        'last_indexed'
+        'last_indexed',
+        'file_creation_date'
+    ];
+
+    protected $casts = [
+        'last_indexed' => 'datetime',
+        'file_creation_date' => 'datetime',
     ];
 
     public function getFilePath(){
@@ -27,5 +33,17 @@ class Index extends Model
     public function getPublicFilePath() {
         $publicPath = str_replace(config('slideshow.imagePath'), '/images', $this->path);
         return "{$publicPath}";
+    }
+
+    /**
+     * Returns the newest or the oldest file date
+     * @param bool $newest Whether to return the newest (true) or oldest file date (false)
+     */
+    public static function getFileDate($newest = true): \DateTime
+    {
+        $index = Index::query()
+            ->orderBy('file_creation_date', ($newest) ? 'desc': 'asc')
+            ->first();
+        return $index['file_creation_date'];
     }
 }

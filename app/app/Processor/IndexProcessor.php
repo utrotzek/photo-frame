@@ -168,6 +168,7 @@ class IndexProcessor
      */
     protected function indexFile(SplFileInfo $file)
     {
+        $creationDate = \DateTime::createFromFormat('U', $file->getCTime());
         Index::query()->updateOrCreate(
             [
                 'path' => $file->getPath(),
@@ -177,6 +178,7 @@ class IndexProcessor
                 'year' =>  $this->extractYear($file),
                 'month' => date('m', $file->getCTime()),
                 'base_name' => $file->getPathInfo()->getBasename(),
+                'file_creation_date' => $creationDate,
                 'last_indexed' => $this->indexTime
             ]
         );

@@ -26,9 +26,9 @@
                         <div class="row">
                             <div class="col-7">
                                 <ul class="info-list">
-                                    <li>Aktuell befinden sich <b>3.020</b> Bilder im Index.</li>
-                                    <li>Das neueste Bild wurde am <b>20.12.2020</b> aufgenomen.</li>
-                                    <li>Das älteste Bild ist vom <b>01.01.1994.</b></li>
+                                    <li>Aktuell befinden sich <b>{{ index.totalFiles.toLocaleString() }}</b> Bilder im Index.</li>
+                                    <li>Das neueste Bild wurde am <b>{{ index.newestFile }}</b> aufgenomen.</li>
+                                    <li>Das älteste Bild ist vom <b>{{ index.oldestFile }}</b></li>
                                 </ul>
                             </div>
                             <div class="col-5">
@@ -72,6 +72,8 @@
 </template>
 
 <script>
+import moment from 'moment';
+
 export default {
     data () {
         return {
@@ -100,7 +102,13 @@ export default {
                 message: '',
                 strokeColor: '#77b300',
             },
+            index: {
+                totalFiles: 0,
+                newestFile: null,
+                oldestFile: null
+            },
             indexStatusInterval: null,
+            indexInterval: null,
             currentInterval: 0
         };
     },
@@ -110,6 +118,9 @@ export default {
         this.progressBar.animation = this.animation.quick;
         this.setDot();
         this.setReload(1000);
+
+        this.pollStatistics();
+        this.indexInterval = setInterval(() => this.pollStatistics(), 10000);
     },
     methods: {
         setReload(time) {
@@ -121,6 +132,14 @@ export default {
         },
         setDot() {
             this.progressBar.dot = '10% '+ this.progressBar.color;
+        },
+        pollStatistics() {
+            axios.get('/api/index/statistics')
+                 .then(res => {
+                    this.index.totalFiles = res.data.totalFiles;
+                    this.index.newestFile = moment(res.data.newestFileDate).format('DD.MM.YYYY');
+                    this.index.oldestFile = moment(res.data.oldestFileDate).format('DD.MM.YYYY');
+                 });
         },
         pollIndex() {
             if (this.progressBar.slowDownOnNextTick){

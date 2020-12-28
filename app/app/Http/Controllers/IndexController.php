@@ -2,7 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use App\Aggregator\IndexStatisticsAggregator;
 use App\Http\Resources\IndexState as IndexStateResource;
+use App\Models\Index;
 use App\Models\IndexState;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
@@ -34,5 +36,10 @@ class IndexController extends Controller
             default:
                 throw new \InvalidArgumentException('state not allowed');
         }
+    }
+
+    public function statistics(): Response
+    {
+        return new Response(IndexStatisticsAggregator::overallStatistics());
     }
 }

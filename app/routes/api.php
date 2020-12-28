@@ -29,6 +29,7 @@ Route::apiResources([
 //index
 Route::get('/index/state', [IndexController::class, 'state']);
 Route::put('/index/update', [IndexController::class, 'update']);
+Route::get('/index/statistics', [IndexController::class, 'statistics']);
 Route::post('/queue/create', [QueueController::class, 'create']);
 Route::get('/queue/current', [QueueController::class, 'current']);
 Route::get('/queue/nextBatch', [QueueController::class, 'nextBatch']);
