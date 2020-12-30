@@ -24,14 +24,14 @@
                     <h5 class="card-header" ><i class="las la-clipboard-list"></i> Bilder Index</h5>
                     <div class="card-body d-flex flex-column justify-content-center">
                         <div class="row">
-                            <div class="col-7">
+                            <div class="col">
                                 <ul class="info-list">
                                     <li>Aktuell befinden sich <b>{{ index.totalFiles.toLocaleString() }}</b> Bilder im Index.</li>
                                     <li>Das neueste Bild wurde am <b>{{ index.newestFile }}</b> aufgenomen.</li>
                                     <li>Das älteste Bild ist vom <b>{{ index.oldestFile }}</b></li>
                                 </ul>
                             </div>
-                            <div class="col-5">
+                            <div class="col col-md-5 text-center">
                                 <div class="progress-bar-wrapper mb-2">
                                     <vue-ellipse-progress
                                         :progress="indexState.percent"
