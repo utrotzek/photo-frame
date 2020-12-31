@@ -22,5 +22,16 @@ mix.webpackConfig({
 mix.js('resources/js/app.js', 'public/js')
     .sass('resources/sass/app.scss', 'public/css')
     .sass('resources/sass/slideshow.scss', 'public/css')
+    //http://randy.works/how-to-insert-svg-files-directly-into-your-vue-components
+    .override(config => {
+        config.module.rules.find(rule =>
+            rule.test.test('.svg')
+        ).exclude = /\.svg$/;
+
+        config.module.rules.push({
+            test: /\.svg$/,
+            use: [{ loader: 'html-loader' }]
+        })
+    });
     //.sourceMaps()
 ;

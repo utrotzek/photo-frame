@@ -18,7 +18,9 @@
 </template>
 
 <script>
+import InlineSvg from "./InlineSvg";
 export default {
+    components: {InlineSvg},
     data () {
         return {
             nextLoading: false,
