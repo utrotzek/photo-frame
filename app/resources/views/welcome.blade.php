@@ -10,12 +10,11 @@
     <link href="{{ mix('css/app.css') }}" rel="stylesheet">
 </head>
 <body>
+    <div id="app" class="container-fluid">
+        <app></app>
+    </div>
 
-<div id="app">
-    <app></app>
-</div>
-
-<!-- Bootstrap core JavaScript-->
-<script src="{{ mix('js/app.js') }}"></script>
+    <!-- Bootstrap core JavaScript-->
+    <script src="{{ mix('js/app.js') }}"></script>
 </body>
 </html>
