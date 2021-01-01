@@ -11,6 +11,13 @@ class Queue extends Model
     use HasFactory;
     protected $table = 'queue';
 
+
+    protected $fillable = [
+        'parent_id',
+        'index_id',
+        'state'
+    ];
+
     const STATE_CURRENT = 'current';
     const STATE_QUEUED = 'queued';
     const STATE_DONE = 'done';

@@ -20,6 +20,9 @@ class QueueProcessor
         if (!empty($toYear)) {
             $queryBuilder->where('year', '<=', $toYear);
         }
+
+        $queryBuilder->orderBy('path');
+        $queryBuilder->orderBy('file_name');
         //TODO: order by date (date is missing currently)
         $indexResult = $queryBuilder->get();
         if (!$indexResult) {
@@ -78,18 +81,15 @@ class QueueProcessor
 
         Queue::query()->truncate();
         $lastItem = null;
+        $queueId = 0;
         foreach ($indexArray as $index) {
-            $queue = new Queue();
-            $queue->index()->associate($index);
-            $queue['state'] = (is_null($lastItem)) ? 'current': 'queued';
-            $queue->save();
-            $queue->fresh();
-
-            if ($lastItem) {
-                $queue->parent()->associate($lastItem);
-                $queue->save();
-            }
-            $lastItem = $queue;
+            $isFirst = ($queueId === 0);
+            Queue::create([
+                'parent_id' => ($isFirst) ? null : $queueId,
+                'state' => ($isFirst) ? 'current': 'queued',
+                'index_id' => $index['id']
+            ]);
+            $queueId++;
         }
     }
 
