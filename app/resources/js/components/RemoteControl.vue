@@ -42,6 +42,10 @@
             </div>
         </div>
 
+        <div class="spinner-wrapper" :class="{ 'd-none': !loading }">
+            <div class="spinner"></div>
+        </div>
+
         <h3>Schnellauswahl</h3>
         <div class="accordion mb-2" id="quick-selection">
             <div id="years" class="card">
@@ -50,19 +54,17 @@
                 </div>
                 <div id="collapseOne" class="collapse" aria-labelledby="headingOne" data-parent="#quick-selection">
                     <div class="card-body">
-                        <form>
-                            <div class="row">
-                                <div class="col">
-                                    <input type="text" class="form-control" placeholder="Von Jahr">
-                                </div>
-                                <div class="col">
-                                    <input type="text" class="form-control" placeholder="Bis Jahr">
-                                </div>
-                                <div class="col">
-                                    <button class="form-control btn btn-primary">Los</button>
-                                </div>
+                        <div class="row">
+                            <div class="col">
+                                <input type="text" class="form-control" placeholder="Von Jahr" v-model="queue.yearSelection.from">
                             </div>
-                        </form>
+                            <div class="col">
+                                <input type="text" class="form-control" placeholder="Bis Jahr" v-model="queue.yearSelection.to">
+                            </div>
+                            <div class="col">
+                                <button class="form-control btn btn-primary" @click="startQueueByYear">Los</button>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -105,6 +107,7 @@
 
 <script>
 import InlineSvg from "./InlineSvg";
+import moment from "moment";
 export default {
     components: {InlineSvg},
     data () {
@@ -112,7 +115,15 @@ export default {
             nextLoading: false,
             prevLoading: false,
             pauseLoading: false,
-            playLoading: false
+            playLoading: false,
+
+            loading: false,
+            queue: {
+                yearSelection: {
+                    from: moment().format('Y'),
+                    to: moment().format('Y')
+                }
+            }
         };
     },
     methods: {
@@ -122,6 +133,18 @@ export default {
                 command: command
             }
             axios.post('/api/commands', cmd);
+        },
+        startQueueByYear() {
+            const queueData = {
+                type: 'year',
+                fromYear: this.queue.yearSelection.from,
+                toYear: this.queue.yearSelection.to
+            };
+            this.loading = true;
+            axios.post('/api/queue/create', queueData)
+                 .finally(res => {
+                     this.loading = false;
+                 });
         }
     }
 };

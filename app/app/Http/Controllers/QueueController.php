@@ -65,7 +65,7 @@ class QueueController extends Controller
 
     public function create(Request $request): Response{
         if (is_null($request->input('type'))){
-            return new Response('Required parameter \'type\' is given');
+            return new Response('Required parameter \'type\' is not given');
         }
 
         switch ($request->input('type')){
@@ -89,7 +89,6 @@ class QueueController extends Controller
                     501
                 );
         }
-
         return new Response('Successfully created');
     }
 }
