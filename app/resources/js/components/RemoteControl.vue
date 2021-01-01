@@ -1,6 +1,15 @@
 <template>
     <div id="remote-control">
         <h1><i class="d-none d-sm-inline las la-hand-point-right"></i> Fernbedienung</h1>
+
+        <div class="messages alert alert-success" :class="{'slide': successMessage}">
+            {{ successMessage }}
+        </div>
+
+        <div class="messages alert alert-danger" :class="{'slide': errorMessage}">
+            {{ errorMessage }}
+        </div>
+
         <div class="row">
             <div class="col-3">
                 <inline-svg name="owl"></inline-svg>
@@ -112,6 +121,8 @@ export default {
     components: {InlineSvg},
     data () {
         return {
+            successMessage: '',
+            errorMessage: '',
             nextLoading: false,
             prevLoading: false,
             pauseLoading: false,
@@ -126,7 +137,23 @@ export default {
             }
         };
     },
+    watch: {
+        successMessage(val) {
+            if (val){
+                setTimeout(this.hideAlert, 5000)
+            }
+        },
+        errorMessage(val) {
+            if (val){
+                setTimeout(this.hideAlert, 5000)
+            }
+        }
+    },
     methods: {
+        hideAlert() {
+            this.successMessage = '';
+            this.errorMessage = '';
+        },
         triggerCommand: function (command) {
             const cmd = {
                 view: 'Slideshow',
@@ -142,15 +169,38 @@ export default {
             };
             this.loading = true;
             axios.post('/api/queue/create', queueData)
-                 .finally(res => {
-                     this.loading = false;
-                 });
+                .then(() => {
+                    this.errorMessage = '';
+                    this.successMessage = 'Eine Warteschlange von ' + this.queue.yearSelection.from + ' bis ' + this.queue.yearSelection.to + ' wurde erfolgreich erstellt.';
+                })
+                .catch(error => {
+                    console.log(error)
+                    this.errorMessage = 'Die Warteschlange konnte nicht erstellt werden. Bitte probieren Sie es erneut. Kontaktieren Sie ansonsten Ihren Administrator.'
+                })
+                .finally(res => {
+                    this.loading = false;
+                });
         }
     }
 };
 </script>
 
 <style>
+    .messages {
+        position: absolute;
+        left: 10px;
+        top: 10px;
+        visibility: hidden;
+        opacity: 0;
+        z-index: 99;
+    }
+
+    .messages.slide {
+        visibility: visible;
+        opacity: 1;
+        transition: 1s;
+    }
+
     #quick-selection .btn {
         padding: 0;
     }
