@@ -117,13 +117,13 @@
         <div id="remote-control-bar" class="footer">
             <div class="row">
                 <div class="col">
-                    <button type="button" class="btn btn-secondary remote-button" :disabled="prevLoading" @click="triggerCommand('prev')"><i class="las la-step-backward"></i></button>
+                    <button type="button" class="btn btn-secondary remote-button" :disabled="prevLoading" @click="triggerAction('prev')"><i class="las la-step-backward"></i></button>
                 </div>
                 <div class="col">
-                    <button type="button" class="btn btn-secondary remote-button" :disabled="playLoading" @click="triggerCommand('play')"><i class="las la-play-circle"></i></button>
+                    <button type="button" class="btn btn-secondary remote-button" :disabled="playLoading" @click="triggerAction('play')"><i class="las la-play-circle"></i></button>
                 </div>
                 <div class="col">
-                    <button type="button" class="btn btn-secondary remote-button" :disabled="nextLoading" @click="triggerCommand('next')"><i class="las la-step-forward"></i></button>
+                    <button type="button" class="btn btn-secondary remote-button" :disabled="nextLoading" @click="triggerAction('next')"><i class="las la-step-forward"></i></button>
                 </div>
             </div>
         </div>
@@ -137,6 +137,7 @@ export default {
     components: {InlineSvg},
     data () {
         return {
+            device: 'main',
             successMessage: '',
             errorMessage: '',
             nextLoading: false,
@@ -189,12 +190,12 @@ export default {
             this.successMessage = '';
             this.errorMessage = '';
         },
-        triggerCommand: function (command) {
-            const cmd = {
-                view: 'Slideshow',
-                command: command
+        triggerAction: function (action, queueTitle = '') {
+            const actionParameter = {
+                action: action,
+                queue_title: queueTitle
             }
-            axios.post('/api/commands', cmd);
+            axios.put('/api/slideshow/triggerNextAction/' + this.device, actionParameter);
         },
         startQueueByYear() {
             const queueData = {

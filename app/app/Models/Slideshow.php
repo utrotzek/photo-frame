@@ -22,8 +22,8 @@ class Slideshow extends Model
     const ACTION_PLAY = 'play';
     const ACTION_PAUSE = 'pause';
     const ACTION_STOP = 'stop';
-    const ACTION_FORWARD = 'forward';
-    const ACTION_BACKWARD = 'backward';
+    const ACTION_PREV = 'prev';
+    const ACTION_NEXT = 'next';
     const ACTION_START_QUEUE = 'start_queue';
     const ACTION_restart = 'restart';
 

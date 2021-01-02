@@ -28,6 +28,7 @@
 export default {
     data () {
         return {
+            device: 'main',
             batchSize: 5,
             active:  0,
             pollCommandsInterval: null,
@@ -150,40 +151,36 @@ export default {
         pollCommands: function() {
             if (!this.commandsProcessing){
                 this.commandsProcessing = true;
-                axios.get('/api/commands?view=Slideshow')
+                axios.get('/api/slideshow/' + this.device)
                     .then(res => {
-                        if (res.data.length > 0) {
-                            this.executeCommands(res.data);
-                            axios.delete('/api/commands/clearView/Slideshow');
+                        if (res.data.next_action !== null){
+                            this.triggerAction(res.data.next_action);
+                            axios.put('/api/slideshow/nextActionDone/' + this.device);
                         }
                         this.commandsProcessing = false;
-                        this.commands = [];
                     });
                 this.disableCommandInfos();
             }
         },
-        executeCommands (commands) {
+        triggerAction (action) {
             this.enableTransition = false;
-            for(let i=0; i < commands.length; i++) {
-                const cmd = commands[i];
-                switch (cmd.command) {
-                    case "next":
-                        this.commandInfo.next = true;
-                        this.next();
-                        break;
-                    case "prev":
-                        this.commandInfo.prev = true;
-                        this.prev();
-                        break;
-                    case "pause":
-                        this.commandInfo.pause = true;
-                        this.setPause(true);
-                        break;
-                    case "play":
-                        this.commandInfo.play = true;
-                        this.setPause(false);
-                        break;
-                }
+            switch (action) {
+                case "next":
+                    this.commandInfo.next = true;
+                    this.next();
+                    break;
+                case "prev":
+                    this.commandInfo.prev = true;
+                    this.prev();
+                    break;
+                case "pause":
+                    this.commandInfo.pause = true;
+                    this.setPause(true);
+                    break;
+                case "play":
+                    this.commandInfo.play = true;
+                    this.setPause(false);
+                    break;
             }
             this.setIntervals();
         },
