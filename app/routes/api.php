@@ -3,6 +3,7 @@
 use App\Http\Controllers\CommandController;
 use App\Http\Controllers\IndexController;
 use App\Http\Controllers\QueueController;
+use App\Http\Controllers\SlideshowController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -25,6 +26,11 @@ Route::delete('/commands/clearView/{view}', [CommandController::class, 'clearVie
 Route::apiResources([
     'commands' => CommandController::class
 ]);
+
+//slideshow
+Route::get('/slideshow/{device}', [SlideshowController::class, 'slideshow']);
+Route::put('/slideshow/triggerNextAction/{device}', [SlideshowController::class, 'triggerNextAction']);
+Route::put('/slideshow/nextActionDone/{device}', [SlideshowController::class, 'nextActionDone']);
 
 //index
 Route::get('/index/state', [IndexController::class, 'state']);
