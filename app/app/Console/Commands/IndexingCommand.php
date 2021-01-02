@@ -5,6 +5,7 @@ namespace App\Console\Commands;
 use App\Models\IndexState;
 use App\Processor\IndexProcessor;
 use Illuminate\Console\Command;
+use Illuminate\Support\Facades\Log;
 
 class IndexingCommand extends Command
 {
@@ -57,11 +58,17 @@ class IndexingCommand extends Command
     private function executeQueueHandler() {
         print_r('queue worker started'. PHP_EOL);
         do {
-            $indexState = IndexState::query()->findOrFail(1)->first();
-            if ($indexState['state'] === IndexState::STATE_TRIGGERED) {
-                $this->indexProcessor->completeIndexUpdate();
+            try {
+                $indexState = IndexState::query()->findOrFail(1)->first();
+                if ($indexState['state'] === IndexState::STATE_TRIGGERED) {
+                    $this->indexProcessor->completeIndexUpdate();
+                }
+                sleep(5);
+            } catch (\Exception $exception) {
+                //Keep the worker alive but log the error message and wait 30 secons before trying to execute again
+                Log::error($exception->getMessage());
+                sleep(30);
             }
-            sleep(5);
         } while (true);
     }
 }
