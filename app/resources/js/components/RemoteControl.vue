@@ -117,13 +117,31 @@
         <div id="remote-control-bar" class="footer">
             <div class="row">
                 <div class="col">
-                    <button type="button" class="btn btn-secondary remote-button" :disabled="prevLoading" @click="triggerAction('prev')"><i class="las la-step-backward"></i></button>
+                    <button type="button" class="btn btn-secondary remote-button" @click="triggerAction('prev')"><i class="las la-step-backward"></i></button>
                 </div>
                 <div class="col">
-                    <button type="button" class="btn btn-secondary remote-button" :disabled="playLoading" @click="triggerAction('play')"><i class="las la-play-circle"></i></button>
+                    <button
+                        type="button"
+                        class="btn btn-secondary remote-button"
+                        @click="triggerAction('play')"
+                        v-if="slideShowState === 'pause'"
+                    >
+                            <i class="las la-pause-circle"></i>
+                    </button>
+
+                    <button
+                        type="button"
+                        class="btn btn-secondary remote-button"
+                        @click="triggerAction('pause')"
+                        v-else
+                    >
+                            <i class="las la-play-circle"></i>
+                    </button>
+
+
                 </div>
                 <div class="col">
-                    <button type="button" class="btn btn-secondary remote-button" :disabled="nextLoading" @click="triggerAction('next')"><i class="las la-step-forward"></i></button>
+                    <button type="button" class="btn btn-secondary remote-button" @click="triggerAction('next')"><i class="las la-step-forward"></i></button>
                 </div>
             </div>
         </div>
@@ -140,12 +158,8 @@ export default {
             device: 'main',
             successMessage: '',
             errorMessage: '',
-            nextLoading: false,
-            prevLoading: false,
-            pauseLoading: false,
-            playLoading: false,
-
             loading: false,
+            pendingAction: false,
 
             index: {
                 allYeas: []
@@ -155,7 +169,8 @@ export default {
                     from: '',
                     to: ''
                 }
-            }
+            },
+            slideShowState: null
         };
     },
     watch: {
@@ -172,8 +187,17 @@ export default {
     },
     mounted() {
         this.loadYears();
+        this.loadSlideshowState();
+        setInterval(this.loadSlideshowState, 1000);
     },
     methods: {
+        loadSlideshowState: function() {
+            axios.get('/api/slideshow/' + this.device)
+                 .then(res => {
+                     this.slideShowState = res.data.action;
+                 });
+        },
+
         loadYears() {
             axios.get('/api/index/years')
                  .then(res => {
