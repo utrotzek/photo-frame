@@ -42,4 +42,9 @@ class IndexController extends Controller
     {
         return new Response(IndexStatisticsAggregator::overallStatistics());
     }
+
+    public function years(): Response
+    {
+        return new Response(Index::getAllYears());
+    }
 }

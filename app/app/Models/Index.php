@@ -46,4 +46,17 @@ class Index extends Model
             ->first();
         return $index['file_creation_date'];
     }
+
+    /**
+     * Returns a list of all years which are currently in the index
+     * @return array
+     */
+    public static function getAllYears(): array
+    {
+        return self::query()
+            ->select('year')
+            ->groupBy('year')
+            ->pluck('year')
+            ->toArray();
+    }
 }

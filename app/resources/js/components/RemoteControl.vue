@@ -65,10 +65,26 @@
                     <div class="card-body">
                         <div class="row">
                             <div class="col">
-                                <input type="text" class="form-control" placeholder="Von Jahr" v-model="queue.yearSelection.from">
+                                <select
+                                    class="form-control"
+                                    v-model="queue.yearSelection.from"
+                                >
+                                    <option disabled selected value="">Bitte wählen Sie ein Jahr</option>
+                                    <option v-for="year in index.allYeas">
+                                        {{ year }}
+                                    </option>
+                                </select>
                             </div>
                             <div class="col">
-                                <input type="text" class="form-control" placeholder="Bis Jahr" v-model="queue.yearSelection.to">
+                                <select
+                                    class="form-control"
+                                    v-model="queue.yearSelection.to"
+                                >
+                                    <option disabled selected value="">Bitte wählen Sie ein Jahr</option>
+                                    <option v-for="year in index.allYeas">
+                                        {{ year }}
+                                    </option>
+                                </select>
                             </div>
                             <div class="col">
                                 <button class="form-control btn btn-primary" @click="startQueueByYear">Los</button>
@@ -129,10 +145,14 @@ export default {
             playLoading: false,
 
             loading: false,
+
+            index: {
+                allYeas: []
+            },
             queue: {
                 yearSelection: {
-                    from: moment().format('Y'),
-                    to: moment().format('Y')
+                    from: '',
+                    to: ''
                 }
             }
         };
@@ -149,7 +169,22 @@ export default {
             }
         }
     },
+    mounted() {
+        this.loadYears();
+    },
     methods: {
+        loadYears() {
+            axios.get('/api/index/years')
+                 .then(res => {
+                     this.index.allYeas = res.data;
+
+                     if (res.data.length > 0) {
+                         const highestYear = res.data[res.data.length -1];
+                         this.queue.yearSelection.from = highestYear;
+                         this.queue.yearSelection.to = highestYear;
+                     }
+                 });
+        },
         hideAlert() {
             this.successMessage = '';
             this.errorMessage = '';
