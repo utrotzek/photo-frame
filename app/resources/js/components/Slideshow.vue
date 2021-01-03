@@ -167,7 +167,15 @@ export default {
                 this.commandsProcessing = true;
                 axios.get('/api/slideshow/' + this.device)
                     .then(res => {
-                        if (res.data.next_action !== null){
+                        switch (res.data.action) {
+                            case 'play':
+                                this.setPause(false)
+                                break;
+                            case 'pause':
+                                this.setPause(true)
+                                break;
+                        }
+                        if (res.data.next_action !== null) {
                             this.triggerAction(res.data.next_action, res.data.next_queue_title);
                             axios.put('/api/slideshow/nextActionDone/' + this.device);
                         }
