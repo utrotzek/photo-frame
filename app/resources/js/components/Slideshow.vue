@@ -31,7 +31,7 @@ export default {
     data () {
         return {
             device: 'main',
-            batchSize: 5,
+            batchSize: 2,
             active:  0,
             pollCommandsInterval: null,
             slideshowInterval: null,
