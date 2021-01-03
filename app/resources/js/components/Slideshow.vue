@@ -31,7 +31,7 @@ export default {
     data () {
         return {
             device: 'main',
-            batchSize: 2,
+            batchSize: 4,
             active:  0,
             pollCommandsInterval: null,
             slideshowInterval: null,
@@ -152,7 +152,7 @@ export default {
         setIntervals () {
             clearInterval(this.slideshowInterval);
             clearInterval(this.pollCommandsInterval);
-            this.slideshowInterval = setInterval(() => this.triggerSlideshow(), 10000);
+            this.slideshowInterval = setInterval(() => this.triggerSlideshow(), 20000);
             this.pollCommandsInterval = setInterval(() => this.pollCommands(), 1000);
         },
         disableCommandInfos () {
