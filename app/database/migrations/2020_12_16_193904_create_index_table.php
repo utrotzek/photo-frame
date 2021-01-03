@@ -22,7 +22,7 @@ class CreateIndexTable extends Migration
             $table->integer('month');
             $table->string('base_name');
             $table->timestamp('last_indexed')->nullable();
-            $table->timestamp('file_creation_date');
+            $table->timestamp('file_creation_date')->nullable();
         });
     }
 
