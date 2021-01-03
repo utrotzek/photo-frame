@@ -232,6 +232,8 @@ export default {
                 .then(() => {
                     this.errorMessage = '';
                     this.successMessage = 'Eine Warteschlange von ' + this.queue.yearSelection.from + ' bis ' + this.queue.yearSelection.to + ' wurde erfolgreich erstellt.';
+                    const queueTitle = 'Fotos von ' + this.queue.yearSelection.from + ' bis ' + this.queue.yearSelection.to;
+                    this.triggerAction('start_queue', queueTitle);
                 })
                 .catch(error => {
                     console.log(error)

@@ -2,12 +2,17 @@
     <div id="slideshow">
         <div id="command-info-wrapper">
             <div id="command-info">
+                <i class="icon las la-stream" :class="{active: commandInfo.start_queue}"></i>
                 <i class="icon las la-pause-circle" :class="{active: commandInfo.pause}"></i>
                 <i class="icon las la-play-circle" :class="{active: commandInfo.play}"></i>
                 <i class="icon las la-step-forward" :class="{active: commandInfo.next}"></i>
                 <i class="icon las la-step-backward" :class="{active: commandInfo.prev}"></i>
             </div>
         </div>
+
+        <h1 class="info-message" :class="{'slide': message}">
+            {{ message }}
+        </h1>
 
         <ul id="all_slides">
             <li
@@ -20,9 +25,6 @@
         </ul>
     </div>
 </template>
-<style>
-    @import '/css/slideshow.css';
-</style>
 
 <script>
 export default {
@@ -36,11 +38,13 @@ export default {
             pause: false,
             commandsProcessing: false,
             enableTransition: true,
+            message: '',
             commandInfo: {
                 pause: false,
                 prev: false,
                 next: false,
                 play: false,
+                start_queue: false,
             },
             images: []
 
@@ -53,6 +57,15 @@ export default {
         this.loadCurrentImage();
         this.loadPreviousBatch();
         this.loadNextBatch();
+    },
+    watch: {
+        message(val) {
+            if (val){
+                setTimeout(() => {
+                    this.message = '';
+                }, 5000)
+            }
+        }
     },
     methods: {
         loadCurrentImage() {
@@ -147,6 +160,7 @@ export default {
             this.commandInfo.pause = false;
             this.commandInfo.prev = false;
             this.commandInfo.play = false;
+            this.commandInfo.start_queue = false;
         },
         pollCommands: function() {
             if (!this.commandsProcessing){
@@ -154,7 +168,7 @@ export default {
                 axios.get('/api/slideshow/' + this.device)
                     .then(res => {
                         if (res.data.next_action !== null){
-                            this.triggerAction(res.data.next_action);
+                            this.triggerAction(res.data.next_action, res.data.next_queue_title);
                             axios.put('/api/slideshow/nextActionDone/' + this.device);
                         }
                         this.commandsProcessing = false;
@@ -162,7 +176,7 @@ export default {
                 this.disableCommandInfos();
             }
         },
-        triggerAction (action) {
+        triggerAction (action, queueTitle) {
             this.enableTransition = false;
             switch (action) {
                 case "next":
@@ -181,6 +195,10 @@ export default {
                     this.commandInfo.play = true;
                     this.setPause(false);
                     break;
+                case "start_queue":
+                    this.commandInfo.start_queue = true;
+                    this.startQueue(queueTitle)
+
             }
             this.setIntervals();
         },
@@ -210,7 +228,42 @@ export default {
                 .then(res => {
                     this.loadCurrentImage();
                 });
+        },
+        startQueue(title) {
+            axios.put('/api/queue/move', {direction: 'restart'})
+                .then(res => {
+                    this.images = [];
+                    this.setPause(false);
+                    this.message = 'Fotoshow ' + title + '\' wurde gestartet';
+
+                    setTimeout(() => {
+                        this.loadCurrentImage();
+                        this.loadPreviousBatch();
+                        this.loadNextBatch();
+                    }, 2000)
+                });
         }
     }
 };
 </script>
+
+<style scoped>
+@import '/css/slideshow.css';
+
+.info-message {
+    position: absolute;
+    left: 10px;
+    top: 10px;
+    visibility: hidden;
+    opacity: 0;
+    z-index: 99;
+    width: 100%;
+    text-align: center;
+}
+
+.info-message.slide {
+    visibility: visible;
+    opacity: 1;
+    transition: 1s;
+}
+</style>

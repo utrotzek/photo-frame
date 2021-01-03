@@ -60,6 +60,11 @@ class QueueController extends Controller
             case 'backward':
                 $this->queueProcessor->moveBackward();
                 break;
+            case 'restart':
+                $this->queueProcessor->restart();
+                break;
+            default:
+                return new Response('Invalid direction '.$direction, 404);
         }
     }
 

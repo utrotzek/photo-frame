@@ -31,9 +31,28 @@ class QueueProcessor
         $this->createQueue($indexResult, $shuffle);
     }
 
+    public function restart()
+    {
+        $current = Queue::findCurrent();
+        if ($current != null) {
+            $current['state'] = Queue::STATE_QUEUED;
+            $current->save();
+        }
+
+        $first = Queue::query()->first();
+        $first['state'] = Queue::STATE_CURRENT;
+        $first->save();
+    }
+
     public function moveForward()
     {
         $current = Queue::findCurrent();
+
+        if ($current === null) {
+            $this->restart();
+            return;
+        }
+
         $next = $current->getNextItem();
 
         if ($next){
@@ -49,13 +68,15 @@ class QueueProcessor
             $first['state'] = QUEUE::STATE_CURRENT;
             $first->save();
         }
-
-
     }
 
     public function moveBackward()
     {
         $current = Queue::findCurrent();
+        if ($current === null) {
+            $this->restart();
+            return;
+        }
         $previous = $current->getPreviousItem();
 
         if ($previous){
