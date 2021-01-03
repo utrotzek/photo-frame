@@ -49,14 +49,15 @@ class SlideshowController extends Controller
             return new Response('No pending next action');
         }
 
-        if (
-            $slideshow['next_action'] === Slideshow::ACTION_START_QUEUE or
-            $slideshow['next_action'] === Slideshow::ACTION_PREV or
-            $slideshow['next_action'] === Slideshow::ACTION_NEXT
-        ) {
+        if ($slideshow['next_action'] === Slideshow::ACTION_START_QUEUE) {
             $slideshow['queue_title'] = $slideshow['next_queue_title'];
             $slideshow['action'] = Slideshow::ACTION_PLAY;
-        }else {
+        } elseif (
+            $slideshow['next_action'] === Slideshow::ACTION_NEXT or
+            $slideshow['next_action'] === Slideshow::ACTION_PREV
+        ) {
+            //do not change currenct action
+        } else {
             $slideshow['action'] = $slideshow['next_action'];
         }
 
