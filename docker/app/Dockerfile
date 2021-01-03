@@ -36,7 +36,6 @@ RUN add-apt-repository ppa:ondrej/php && \
         php${PHP_VERSION}-ctype \
         php${PHP_VERSION}-bcmath \
         php${PHP_VERSION}-xdebug \
-        php${PHP_VERSION}-sqlite \
         libapache2-mod-php
 
 RUN a2dissite 000-default
@@ -58,11 +57,8 @@ RUN chown -R $USER_NAME:$USER_NAME /var/run/apache2*
 RUN ln -sf /dev/stdout /var/log/apache2/access.log && \
     ln -sf /dev/stderr /var/log/apache2/error.log
 
-RUN mkdir -p /var/database/ && \
-    chown $USER_NAME:$USER_NAME /var/database/
 USER $USER_NAME
 WORKDIR /var/www/html/app
-
 
 COPY resources/start.sh /usr/bin/local/start.sh
 CMD ["/usr/bin/local/start.sh"]
