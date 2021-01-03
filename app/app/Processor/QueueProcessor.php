@@ -103,15 +103,19 @@ class QueueProcessor
         Queue::query()->truncate();
         $lastItem = null;
         $queueId = 0;
+
+        $data = [];
         foreach ($indexArray as $index) {
             $isFirst = ($queueId === 0);
-            Queue::create([
+            $data[] = [
                 'parent_id' => ($isFirst) ? null : $queueId,
                 'state' => ($isFirst) ? 'current': 'queued',
                 'index_id' => $index['id']
-            ]);
+            ];
             $queueId++;
         }
+        Queue::query()->insert($data);
+
     }
 
 }
