@@ -2,7 +2,6 @@
     <div id="slideshow">
         <div id="command-info-wrapper">
             <div id="command-info">
-                <i class="icon las la-stream" :class="{active: commandInfo.start_queue}"></i>
                 <i class="icon las la-pause-circle" :class="{active: commandInfo.pause}"></i>
                 <i class="icon las la-play-circle" :class="{active: commandInfo.play}"></i>
                 <i class="icon las la-step-forward" :class="{active: commandInfo.next}"></i>
@@ -10,8 +9,8 @@
             </div>
         </div>
 
-        <h1 class="info-message" :class="{'slide': message}">
-            {{ message }}
+        <h1 class="info-message" :class="{'smooth': message}">
+            {{ message }} <i class="icon las la-stream"></i>
         </h1>
 
         <div id="all_slides">
@@ -54,7 +53,6 @@ export default {
                 prev: false,
                 next: false,
                 play: false,
-                start_queue: false,
             },
             images: []
 
@@ -170,7 +168,6 @@ export default {
             this.commandInfo.pause = false;
             this.commandInfo.prev = false;
             this.commandInfo.play = false;
-            this.commandInfo.start_queue = false;
         },
         pollCommands: function() {
             if (!this.commandsProcessing){
@@ -214,7 +211,6 @@ export default {
                     this.setPause(false);
                     break;
                 case "start_queue":
-                    this.commandInfo.start_queue = true;
                     this.startQueue(queueTitle)
 
             }
@@ -258,7 +254,7 @@ export default {
                         this.loadCurrentImage();
                         this.loadPreviousBatch();
                         this.loadNextBatch();
-                    }, 2000)
+                    }, 5000)
                 });
         }
     }
@@ -267,17 +263,25 @@ export default {
 
 <style scoped>
 .info-message {
-    position: absolute;
-    left: 10px;
-    top: 10px;
-    visibility: hidden;
-    opacity: 0;
+    color: limegreen;
+    mix-blend-mode: revert;
+    font-size: 3rem;
+
     z-index: 99;
+    bottom: 0;
+    height: 100px;
+    left: 0;
+    margin: auto;
+    position: absolute;
+    top: 0;
+    right: 0;
     width: 100%;
     text-align: center;
+    visibility: hidden;
+    opacity: 0;
 }
 
-.info-message.slide {
+.info-message.smooth {
     visibility: visible;
     opacity: 1;
     transition: 1s;
