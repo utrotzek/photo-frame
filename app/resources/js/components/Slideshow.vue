@@ -14,15 +14,25 @@
             {{ message }}
         </h1>
 
-        <ul id="all_slides">
-            <li
-                v-for="(item) in images"
-                :key="item.id"
-                class="slide"
-                :class="{active: item.active, 'no-transition': !enableTransition}"
-                :style="{ backgroundImage: 'url(\'' + encodeURI(item.path) + '\')' }"
-            />
-        </ul>
+        <div id="all_slides">
+            <ul>
+                <li
+                    v-for="(item) in images"
+                    :key="item.id"
+                    class="slide background"
+                    :class="{active: item.active, 'no-transition': !enableTransition}"
+                    :style="{ backgroundImage: 'url(\'' + encodeURI(item.path) + '\')' }"
+                >
+                </li>
+                <li
+                    v-for="(item) in images"
+                    :key="item.id"
+                    class="slide foreground"
+                    :class="{active: item.active, 'no-transition': !enableTransition}"
+                    :style="{ backgroundImage: 'url(\'' + encodeURI(item.path) + '\')' }"
+                />
+            </ul>
+        </div>
     </div>
 </template>
 
@@ -152,7 +162,7 @@ export default {
         setIntervals () {
             clearInterval(this.slideshowInterval);
             clearInterval(this.pollCommandsInterval);
-            this.slideshowInterval = setInterval(() => this.triggerSlideshow(), 20000);
+            this.slideshowInterval = setInterval(() => this.triggerSlideshow(), 30000);
             this.pollCommandsInterval = setInterval(() => this.pollCommands(), 1000);
         },
         disableCommandInfos () {
@@ -256,8 +266,6 @@ export default {
 </script>
 
 <style scoped>
-@import '/css/slideshow.css';
-
 .info-message {
     position: absolute;
     left: 10px;
@@ -273,5 +281,127 @@ export default {
     visibility: visible;
     opacity: 1;
     transition: 1s;
+}
+
+#slideshow {
+    cursor: none;
+}
+
+#all_slides {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+}
+
+.slide {
+    overflow: hidden;
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    opacity: 0;
+    -webkit-transition: opacity 10s;
+    -moz-transition: opacity 10s;
+    -o-transition: opacity 10s;
+    transition: opacity 10s;
+    padding: 40px;
+}
+
+.slide.background {
+    background-size: 110%;
+    background-repeat: no-repeat;
+    -webkit-filter: blur(50px) contrast(105%);
+}
+
+.slide.background.active {
+    opacity: 1;
+    z-index: 19;
+    animation: zoom-in-and-out-background-image 30s infinite ease-in-out;
+}
+
+.slide.foreground {
+    background-size: contain;
+    background-position: 50% 50%;
+    background-repeat: no-repeat;
+    background-color: transparent;
+}
+
+.slide.foreground.active{
+    opacity: 1;
+    z-index: 20;
+    animation: zoom-in-and-out-foreground-image 30s infinite ease-in-out;
+}
+
+.slide.no-transition {
+    -webkit-transition: none;
+    -moz-transition: none;
+    -o-transition: none;
+    transition: none;
+}
+
+
+#command-info .icon {
+    display: none;
+    z-index: 30;
+    font-size: 8rem;
+    bottom: 0;
+    height: 100px;
+    left: 0;
+    margin: auto;
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 100px;
+}
+
+@keyframes zoom-in-and-out-background-image {
+    0% {
+        transform: scale(1);
+    }
+    50% {
+        transform: scale(1.2,1.2);
+    }
+    100% {
+        transform: scale(1);
+    }
+}
+
+@keyframes zoom-in-and-out-foreground-image {
+    0% {
+        transform: scale(1);
+    }
+    50% {
+        transform: scale(1.04,1.04);
+    }
+    100% {
+        transform: scale(1);
+    }
+}
+
+@keyframes showCommandInfoIcon{
+    0%{
+        opacity: 90%;
+        transform: rotateX(90deg);
+    }
+    50%{
+        opacity: 80%;
+        transform: rotateX(0deg);
+    }
+    100%{
+        opacity: 0;
+        display: none;
+        transform: rotateX(90deg);
+    }
+}
+
+#command-info .icon.active {
+    display: block;
+    animation-name: showCommandInfoIcon;
+    animation-duration: 1000ms;
+    animation-fill-mode: forwards;
 }
 </style>
