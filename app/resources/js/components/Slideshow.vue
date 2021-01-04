@@ -308,10 +308,6 @@ export default {
     width: 100%;
     height: 100%;
     opacity: 0;
-    -webkit-transition: opacity 10s;
-    -moz-transition: opacity 10s;
-    -o-transition: opacity 10s;
-    transition: opacity 10s;
     padding: 40px;
 }
 
@@ -328,6 +324,10 @@ export default {
 }
 
 .slide.foreground {
+    -webkit-transition: opacity 10s;
+    -moz-transition: opacity 10s;
+    -o-transition: opacity 10s;
+    transition: opacity 10s;
     background-size: contain;
     background-position: 50% 50%;
     background-repeat: no-repeat;
