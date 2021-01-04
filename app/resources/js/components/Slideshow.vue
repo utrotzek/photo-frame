@@ -324,7 +324,7 @@ export default {
 .slide.background.active {
     opacity: 1;
     z-index: 19;
-    animation: zoom-in-and-out-background-image 30s infinite ease-in-out;
+    /*animation: zoom-in-and-out-background-image 30s infinite ease-in-out;*/
 }
 
 .slide.foreground {
@@ -337,7 +337,7 @@ export default {
 .slide.foreground.active{
     opacity: 1;
     z-index: 20;
-    animation: zoom-in-and-out-foreground-image 30s infinite ease-in-out;
+    /*animation: zoom-in-and-out-foreground-image 30s infinite ease-in-out;*/
 }
 
 .slide.no-transition {
