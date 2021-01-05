@@ -4,14 +4,19 @@
     <meta charset="utf-8">
     <title>welcome.</title>
     <meta name="description" content="Login Page">
-    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="viewport" content="height=device-height,
+                      width=device-width, initial-scale=1.0,
+                      minimum-scale=1.0, maximum-scale=1.0,
+                      user-scalable=no, target-densitydpi=device-dpi">
 
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <link href="{{ mix('css/app.css') }}" rel="stylesheet">
 </head>
 <body>
-    <div id="app" class="container-fluid">
-        <app></app>
+    <div id="app">
+        <div>
+            <app></app>
+        </div>
     </div>
 
     <!-- Bootstrap core JavaScript-->
