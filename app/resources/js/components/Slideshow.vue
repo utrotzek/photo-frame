@@ -301,6 +301,10 @@ export default {
 }
 
 .slide {
+    -webkit-transition: opacity 10s;
+    -moz-transition: opacity 10s;
+    -o-transition: opacity 10s;
+    transition: opacity 10s;
     overflow: hidden;
     position: absolute;
     left: 0;
@@ -320,14 +324,10 @@ export default {
 .slide.background.active {
     opacity: 1;
     z-index: 19;
-    /*animation: zoom-in-and-out-background-image 30s infinite ease-in-out;*/
+    animation: zoom-in-and-out-background-image 30s infinite ease-in-out;
 }
 
 .slide.foreground {
-    -webkit-transition: opacity 10s;
-    -moz-transition: opacity 10s;
-    -o-transition: opacity 10s;
-    transition: opacity 10s;
     background-size: contain;
     background-position: 50% 50%;
     background-repeat: no-repeat;
@@ -337,7 +337,7 @@ export default {
 .slide.foreground.active{
     opacity: 1;
     z-index: 20;
-    /*animation: zoom-in-and-out-foreground-image 30s infinite ease-in-out;*/
+    animation: zoom-in-and-out-foreground-image 30s infinite ease-in-out;
 }
 
 .slide.no-transition {
