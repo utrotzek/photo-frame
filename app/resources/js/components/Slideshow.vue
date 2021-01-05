@@ -301,10 +301,10 @@ export default {
 }
 
 .slide {
-    -webkit-transition: opacity 10s;
-    -moz-transition: opacity 10s;
-    -o-transition: opacity 10s;
-    transition: opacity 10s;
+    -webkit-transition: opacity 6s;
+    -moz-transition: opacity 6s;
+    -o-transition: opacity 6s;
+    transition: opacity 6s;
     overflow: hidden;
     position: absolute;
     left: 0;
