@@ -31,6 +31,10 @@ mix.js('resources/js/app.js', 'public/js')
             test: /\.svg$/,
             use: [{ loader: 'html-loader' }]
         })
-    });
+    })
     //.sourceMaps()
 ;
+
+if (mix.inProduction()) {
+    mix.version();
+}
