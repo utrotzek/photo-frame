@@ -21,32 +21,32 @@
             </div>
         </div>
 
-        <h3>Fotos von 2019 - 2020</h3>
+        <h3>{{ slideshow.queueTitle }}</h3>
         <div id="player-information" class="row mb-3">
             <!-- /.info-box -->
             <div class="col-sm-6 col-12">
                 <div class="row">
                     <div class="clm col-12">
                         <i class="info-icon las la-stream mr-1"></i>
-                        <span class="info-text"><b>54</b> von <b>3400</b></span></div>
+                        <span class="info-text"><b>{{ queue.statistics.current_position }}</b> von <b>{{ queue.statistics.total }}</b></span></div>
                 </div>
 
                 <div class="row">
                     <div class="clm col-12">
                         <i class="info-icon las la-image mr-1"></i>
-                        <span class="info-text">IMG_2020.jpg</span></div>
+                        <span class="info-text">{{ queue.statistics.file_name }}</span></div>
                 </div>
 
                 <div class="row">
                     <div class="clm col-12">
                         <i class="info-icon las la-folder-open mr-1"></i>
-                        <span class="info-text">Urlaub Ägypten</span></div>
+                        <span class="info-text">{{ queue.statistics.album }}</span></div>
                 </div>
 
                 <div class="row">
                     <div class="clm col-12">
                         <i class="info-icon las la-calendar mr-1"></i>
-                        <span class="info-text">2019</span></div>
+                        <span class="info-text">{{ queue.statistics.year }}</span></div>
                 </div>
             </div>
         </div>
@@ -124,7 +124,7 @@
                         type="button"
                         class="btn btn-secondary remote-button"
                         @click="triggerAction('play')"
-                        v-if="slideShowState === 'pause'"
+                        v-if="slideshow.state === 'pause'"
                     >
                             <i class="las la-pause-circle"></i>
                     </button>
@@ -168,9 +168,19 @@ export default {
                 yearSelection: {
                     from: '',
                     to: ''
+                },
+                statistics: {
+                    total: 0,
+                    current_position: 0,
+                    year: 0,
+                    file_name: '',
+                    album: '',
                 }
             },
-            slideShowState: null
+            slideshow: {
+                state: null,
+                queueTitle: ''
+            }
         };
     },
     watch: {
@@ -188,14 +198,26 @@ export default {
     mounted() {
         this.loadYears();
         this.loadSlideshowState();
-        setInterval(this.loadSlideshowState, 1000);
+        setInterval(this.loadSlideshowState, 2000);
     },
     methods: {
         loadSlideshowState: function() {
             axios.get('/api/slideshow/' + this.device)
                  .then(res => {
-                     this.slideShowState = res.data.action;
+                     this.slideshow.state = res.data.action;
+                     this.slideshow.queueTitle = res.data.queue_title;
                  });
+
+            axios.get('/api/queue/statistics')
+                .then(res => {
+                    this.queue.statistics = {
+                        total: res.data.total,
+                        current_position: res.data.current_position,
+                        year: res.data.year,
+                        album: res.data.album,
+                        file_name: res.data.file_name
+                    }
+                });
         },
 
         loadYears() {
@@ -220,6 +242,7 @@ export default {
                 queue_title: queueTitle
             }
             axios.put('/api/slideshow/triggerNextAction/' + this.device, actionParameter);
+            this.loadSlideshowState();
         },
         startQueueByYear() {
             const queueData = {

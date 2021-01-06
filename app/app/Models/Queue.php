@@ -102,4 +102,9 @@ class Queue extends Model
         }
         return null;
     }
+
+    public static function getCurrentPosition(): int
+    {
+
+    }
 }

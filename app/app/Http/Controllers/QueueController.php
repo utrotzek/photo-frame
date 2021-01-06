@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Resources\QueueResource;
+use App\Models\Index;
 use App\Models\Queue;
 use App\Processor\QueueProcessor;
 use Illuminate\Http\Request;
@@ -95,5 +96,21 @@ class QueueController extends Controller
                 );
         }
         return new Response('Successfully created');
+    }
+
+    public function statistics(Request $request): Response
+    {
+        /** @var Queue $currentQueue */
+        $currentQueue = Queue::findCurrent();
+        /** @var Index $currentIndex */
+        $currentIndex = Queue::findCurrent()->index()->get()->first();
+
+        return new Response([
+            'total'  => Queue::query()->count(),
+            'current_position' => $currentQueue['id'],
+            'year' => $currentIndex['year'],
+            'file_name' => $currentIndex['file_name'],
+            'album' => $currentIndex['base_name']
+        ]);
     }
 }
