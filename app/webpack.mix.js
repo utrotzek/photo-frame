@@ -35,6 +35,4 @@ mix.js('resources/js/app.js', 'public/js')
     //.sourceMaps()
 ;
 
-if (mix.inProduction()) {
-    mix.version();
-}
+mix.version();
