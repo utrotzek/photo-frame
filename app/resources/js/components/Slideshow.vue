@@ -362,6 +362,12 @@ export default {
     width: 100px;
 }
 
+
+#command-info .icon.active {
+    display: block;
+    animation: show-info-icon 1s ease-in;
+}
+
 @keyframes zoom-in-and-out-background-image {
     0% {
         transform: scale(1);
@@ -386,7 +392,7 @@ export default {
     }
 }
 
-@keyframes showCommandInfoIcon{
+@keyframes show-info-icon {
     0%{
         opacity: 90%;
         transform: rotateX(90deg);
@@ -400,12 +406,5 @@ export default {
         display: none;
         transform: rotateX(90deg);
     }
-}
-
-#command-info .icon.active {
-    display: block;
-    animation-name: showCommandInfoIcon;
-    animation-duration: 1000ms;
-    animation-fill-mode: forwards;
 }
 </style>
