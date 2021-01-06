@@ -261,9 +261,11 @@ export default {
 };
 </script>
 
-<style scoped>
+<style scoped lang="scss">
+@import "../../sass/variables";
+
 .info-message {
-    color: limegreen;
+    color: $teal;
     mix-blend-mode: revert;
     font-size: 3rem;
 
@@ -349,6 +351,7 @@ export default {
 
 
 #command-info .icon {
+    color: $teal;
     display: none;
     z-index: 30;
     font-size: 8rem;
@@ -365,7 +368,7 @@ export default {
 
 #command-info .icon.active {
     display: block;
-    animation: show-info-icon 1s ease-in;
+    animation: show-info-icon 1s;
 }
 
 @keyframes zoom-in-and-out-background-image {
