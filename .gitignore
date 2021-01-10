@@ -2,3 +2,4 @@
 .idea
 data/database/**
 !data/database/.gitkeep
+mix-manifest.json

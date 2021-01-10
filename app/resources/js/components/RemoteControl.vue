@@ -1,6 +1,6 @@
 <template>
     <div id="remote-control">
-        <h1><i class="d-none d-sm-inline las la-hand-point-right"></i> Fernbedienung</h1>
+        <h1><b-icon-controller class="d-none d-sm-inline las"></b-icon-controller> Fernbedienung</h1>
 
         <div class="messages alert alert-success" :class="{'slide': successMessage}">
             {{ successMessage }}
@@ -27,25 +27,25 @@
             <div class="col-sm-6 col-12">
                 <div class="row">
                     <div class="clm col-12">
-                        <i class="info-icon las la-stream mr-1"></i>
+                        <b-icon-view-stacked class="ml-1 mr-1"></b-icon-view-stacked>
                         <span class="info-text"><b>{{ queue.statistics.current_position }}</b> von <b>{{ queue.statistics.total }}</b></span></div>
                 </div>
 
                 <div class="row">
                     <div class="clm col-12">
-                        <i class="info-icon las la-image mr-1"></i>
+                        <b-icon-image class="ml-1 mr-1"></b-icon-image>
                         <span class="info-text">{{ queue.statistics.file_name }}</span></div>
                 </div>
 
                 <div class="row">
                     <div class="clm col-12">
-                        <i class="info-icon las la-folder-open mr-1"></i>
+                        <b-icon-folder2-open class="ml-1 mr-1"></b-icon-folder2-open>
                         <span class="info-text">{{ queue.statistics.album }}</span></div>
                 </div>
 
                 <div class="row">
                     <div class="clm col-12">
-                        <i class="info-icon las la-calendar mr-1"></i>
+                        <b-icon-calendar-date class="ml-1 mr-1"></b-icon-calendar-date>
                         <span class="info-text">{{ queue.statistics.year }}</span></div>
                 </div>
             </div>
@@ -55,14 +55,15 @@
             <div class="spinner"></div>
         </div>
 
-        <h3>Schnellauswahl</h3>
-        <div class="accordion mb-2" id="quick-selection">
-            <div id="years" class="card">
-                <div class="card-header collapsed" id="headingOne" type="button" data-toggle="collapse" data-target="#collapseOne" aria-expanded="false" aria-controls="collapseOne">
-                    <i class="las la-caret-square-right mr-1"></i> Nach Jahren
-                </div>
-                <div id="collapseOne" class="collapse" aria-labelledby="headingOne" data-parent="#quick-selection">
-                    <div class="card-body">
+        <h3>Andere Fotos abspielen</h3>
+        <div class="accordion" role="tablist">
+            <b-card no-body class="mb-1">
+                <b-card-header header-tag="header" class="p-1" role="tab">
+                    <b-button block v-b-toggle.accordion-1 variant="outline-success">Nach Jahren</b-button>
+                </b-card-header>
+                <b-collapse id="accordion-1" accordion="my-accordion" role="tabpanel">
+                    <b-card-body>
+                        <b-card-text><h3>Zeitraum auswählen</h3></b-card-text>
                         <div class="row">
                             <div class="col">
                                 <select
@@ -90,34 +91,37 @@
                                 <button class="form-control btn btn-primary" @click="startQueueByYear">Los</button>
                             </div>
                         </div>
-                    </div>
-                </div>
-            </div>
-            <div id="playlist" class="card">
-                <div class="card-header collapsed" id="headingTwo" type="button" data-toggle="collapse" data-target="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
-                    <i class="las la-caret-square-right mr-1"></i> Playlist auswählen
-                </div>
-                <div id="collapseTwo" class="collapse" aria-labelledby="headingTwo" data-parent="#quick-selection">
-                    <div class="card-body">
-                        Anim pariatur cliche reprehenderit, enim eiusmod high life accusamus terry richardson ad squid. 3 wolf moon officia aute, non cupidatat skateboard dolor brunch. Food truck quinoa nesciunt laborum eiusmod. Brunch 3 wolf moon tempor, sunt aliqua put a bird on it squid single-origin coffee nulla assumenda shoreditch et. Nihil anim keffiyeh helvetica, craft beer labore wes anderson cred nesciunt sapiente ea proident. Ad vegan excepteur butcher vice lomo. Leggings occaecat craft beer farm-to-table, raw denim aesthetic synth nesciunt you probably haven't heard of them accusamus labore sustainable VHS.
-                    </div>
-                </div>
-            </div>
-            <div id="folder" class="card">
-                <div class="card-header collapsed" id="headingThree" type="button" data-toggle="collapse" data-target="#collapseThree" aria-expanded="false" aria-controls="collapseThree">
-                    <i class="las la-caret-square-right mr-1"></i> Ordner auswählen
-                </div>
-                <div id="collapseThree" class="collapse" aria-labelledby="headingThree" data-parent="#quick-selection">
-                    <div class="card-body">
-                        Anim pariatur cliche reprehenderit, enim eiusmod high life accusamus terry richardson ad squid. 3 wolf moon officia aute, non cupidatat skateboard dolor brunch. Food truck quinoa nesciunt laborum eiusmod. Brunch 3 wolf moon tempor, sunt aliqua put a bird on it squid single-origin coffee nulla assumenda shoreditch et. Nihil anim keffiyeh helvetica, craft beer labore wes anderson cred nesciunt sapiente ea proident. Ad vegan excepteur butcher vice lomo. Leggings occaecat craft beer farm-to-table, raw denim aesthetic synth nesciunt you probably haven't heard of them accusamus labore sustainable VHS.
-                    </div>
-                </div>
-            </div>
+                    </b-card-body>
+                </b-collapse>
+            </b-card>
+            <b-card no-body class="mb-1">
+                <b-card-header header-tag="header" class="p-1" role="tab">
+                    <b-button block v-b-toggle.accordion-2 variant="outline-success">Playliste auswählen</b-button>
+                </b-card-header>
+                <b-collapse id="accordion-2" accordion="my-accordion" role="tabpanel">
+                    <b-card-body>
+                        <b-card-text><h3>Playlist auswählen</h3></b-card-text>
+                    </b-card-body>
+                </b-collapse>
+            </b-card>
+
+            <b-card no-body class="mb-1">
+                <b-card-header header-tag="header" class="p-1" role="tab">
+                    <b-button block v-b-toggle.accordion-3 variant="outline-success">Ordner auswählen</b-button>
+                </b-card-header>
+                <b-collapse id="accordion-3" accordion="my-accordion" role="tabpanel">
+                    <b-card-body>
+                        <b-card-text><h3>Ordner auswählen</h3></b-card-text>
+                    </b-card-body>
+                </b-collapse>
+            </b-card>
         </div>
         <div id="remote-control-bar" class="footer">
             <div class="row">
                 <div class="col">
-                    <button type="button" class="btn btn-secondary remote-button" @click="triggerAction('prev')"><i class="las la-step-backward"></i></button>
+                    <button type="button" class="btn btn-secondary remote-button" @click="triggerAction('prev')">
+                        <b-icon-skip-backward class="icon"></b-icon-skip-backward>
+                    </button>
                 </div>
                 <div class="col">
                     <button
@@ -126,7 +130,7 @@
                         @click="triggerAction('play')"
                         v-if="slideshow.state === 'pause'"
                     >
-                            <i class="las la-pause-circle"></i>
+                        <b-icon-pause-circle class="icon"></b-icon-pause-circle>
                     </button>
 
                     <button
@@ -135,13 +139,15 @@
                         @click="triggerAction('pause')"
                         v-else
                     >
-                            <i class="las la-play-circle"></i>
+                        <b-icon-play-circle class="icon"></b-icon-play-circle>
                     </button>
 
 
                 </div>
                 <div class="col">
-                    <button type="button" class="btn btn-secondary remote-button" @click="triggerAction('next')"><i class="las la-step-forward"></i></button>
+                    <button type="button" class="btn btn-secondary remote-button" @click="triggerAction('next')">
+                        <b-icon-skip-forward class="icon"></b-icon-skip-forward>
+                    </button>
                 </div>
             </div>
         </div>
@@ -289,9 +295,7 @@ export default {
     #quick-selection .btn {
         padding: 0;
     }
-    #quick-selection .las {
-        font-size:1.3rem;
-    }
+
     #quick-selection .card-header {
         padding-left: 0.2rem;
     }
@@ -328,10 +332,6 @@ export default {
         list-style: none;
     }
 
-    .icon {
-        width: 45px;
-    }
-
     body {
         padding-bottom: 50px;
     }
@@ -349,8 +349,8 @@ export default {
         width:100%;
         height:50px;
     }
-    #remote-control-bar .las {
-        font-size: 45px;
+    #remote-control-bar .icon {
+        font-size: 2em;
     }
     .col {
         padding: 2px;

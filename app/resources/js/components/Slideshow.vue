@@ -2,15 +2,15 @@
     <div id="slideshow">
         <div id="command-info-wrapper">
             <div id="command-info">
-                <i class="icon las la-pause-circle" :class="{active: commandInfo.pause}"></i>
-                <i class="icon las la-play-circle" :class="{active: commandInfo.play}"></i>
-                <i class="icon las la-step-forward" :class="{active: commandInfo.next}"></i>
-                <i class="icon las la-step-backward" :class="{active: commandInfo.prev}"></i>
+                <b-icon-pause-circle class="icon" :class="{active: commandInfo.pause}"></b-icon-pause-circle>
+                <b-icon-play-circle class="icon" :class="{active: commandInfo.play}"></b-icon-play-circle>
+                <b-icon-skip-forward class="icon" :class="{active: commandInfo.next}"></b-icon-skip-forward>
+                <b-icon-skip-backward class="icon" :class="{active: commandInfo.prev}"></b-icon-skip-backward>
             </div>
         </div>
 
         <h1 class="info-message" :class="{'smooth': message}">
-            {{ message }} <i class="icon las la-stream"></i>
+            {{ message }} <b-icon-card-list></b-icon-card-list>
         </h1>
 
         <div id="all_slides">

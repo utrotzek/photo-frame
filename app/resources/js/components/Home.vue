@@ -3,25 +3,25 @@
         <div class="row">
             <div class="col-md-4">
                 <div class="card">
-                    <h5 class="card-header"><i class="lab la-buromobelexperte"></i> Bildershow starten</h5>
+                    <h5 class="card-header"><b-icon-images class="mr-1"></b-icon-images> Bildershow starten</h5>
                     <div class="card-body d-flex flex-column">
                         <p>Die slideshow im Vollbild starten</p>
-                        <router-link class="btn btn-primary mt-auto" to="/slideshow">Bildershow <i class="las la-caret-right"></i></router-link>
+                        <router-link class="btn btn-primary mt-auto" to="/slideshow">Bildershow <b-icon-caret-right></b-icon-caret-right></router-link>
                     </div>
                 </div>
             </div>
             <div class="col-md-4 mt-4 mt-md-0">
                  <div class="card">
-                     <h5 class="card-header"><i class="las la-hand-point-right"></i> Fernbedienung</h5>
+                     <h5 class="card-header"> <b-icon-controller class="mr-1"></b-icon-controller>Fernbedienung</h5>
                      <div class="card-body d-flex flex-column">
                          <p>Mithilfe der Fernbedienung haben Sie die Möglichkeit eine laufende Bildershow, die z.B. auf einem anderen Grät läuft, fernzusteuern.</p>
-                         <router-link class="btn btn-primary mt-auto" to="/remote-control">Fernbedienung <i class="las la-caret-right"></i></router-link>
+                         <router-link class="btn btn-primary mt-auto" to="/remote-control">Fernbedienung <b-icon-caret-right></b-icon-caret-right></router-link>
                      </div>
                  </div>
              </div>
             <div class="col-md-4 mt-4 mt-md-0">
                 <div class="card">
-                    <h5 class="card-header" ><i class="las la-clipboard-list"></i> Bilder Index</h5>
+                    <h5 class="card-header" ><b-icon-card-list class="mr-1"></b-icon-card-list> Bilder Index</h5>
                     <div class="card-body d-flex flex-column justify-content-center">
                         <div class="row">
                             <div class="col">
@@ -55,7 +55,7 @@
                             @click="setTriggered()"
                             v-if="indexState.state !== 'working' && indexState.state !== 'triggered' && indexState.state !== 'starting'"
                         >
-                            Indexierung starten <i class="las la-caret-right"></i>
+                            Indexierung starten <b-icon-caret-right></b-icon-caret-right></i>
                         </button>
                         <button
                             class="btn btn-danger"

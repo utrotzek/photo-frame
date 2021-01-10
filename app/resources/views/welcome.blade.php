@@ -10,7 +10,6 @@
                       user-scalable=no, target-densitydpi=device-dpi">
 
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    <link href="{{ mix('css/app.css') }}" rel="stylesheet">
 </head>
 <body>
     <div id="app">
