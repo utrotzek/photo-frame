@@ -56,6 +56,21 @@
         </div>
 
         <h3>Andere Fotos abspielen</h3>
+        <b-modal id="queue-order-modal" ref="queue-order-modal" centered title="Neue Playlist starten" hide-footer>
+            <p>Eine neue playlist wird gestaret. Bitte wählen Sie aus, in welcher Reihenfolge die Bilder abgespielt werden sollen.</p>
+            <div class="row">
+                <div class="col">
+                    <b-button variant="success" block @click="startQueueByYear(true)">Zufällig</b-button>
+                </div>
+                <div class="col">
+                    <b-button variant="warning" block @click="startQueueByYear(false)">Chronologisch</b-button>
+                </div>
+                <div class="col">
+                    <b-button variant="danger " block @click="hideQueueModal">Abbrechen</b-button>
+                </div>
+            </div>
+        </b-modal>
+
         <div class="accordion" role="tablist">
             <b-card no-body class="mb-1">
                 <b-card-header header-tag="header" class="p-1" role="tab">
@@ -88,7 +103,7 @@
                                 </select>
                             </div>
                             <div class="col">
-                                <button class="form-control btn btn-primary" @click="startQueueByYear">Los</button>
+                                <b-button v-b-modal.queue-order-modal block variant="primary" >Los</b-button>
                             </div>
                         </div>
                     </b-card-body>
@@ -250,13 +265,15 @@ export default {
             axios.put('/api/slideshow/triggerNextAction/' + this.device, actionParameter);
             this.loadSlideshowState();
         },
-        startQueueByYear() {
+        startQueueByYear(random) {
             const queueData = {
                 type: 'year',
                 fromYear: this.queue.yearSelection.from,
-                toYear: this.queue.yearSelection.to
+                toYear: this.queue.yearSelection.to,
+                shuffle: random
             };
             this.loading = true;
+            this.hideQueueModal();
             axios.post('/api/queue/create', queueData)
                 .then(() => {
                     this.errorMessage = '';
@@ -271,7 +288,10 @@ export default {
                 .finally(res => {
                     this.loading = false;
                 });
-        }
+        },
+        hideQueueModal() {
+            this.$refs['queue-order-modal'].hide()
+        },
     }
 };
 </script>

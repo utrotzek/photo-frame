@@ -79,7 +79,8 @@ class QueueController extends Controller
                 $this->queueProcessor->generateQueueByYear(
                     (int)$request->input('fromYear'),
                     (int)$request->input('toYear'),
-                    $request->input('excludes')
+                    $request->input('excludes'),
+                    $request->input('shuffle') ?? true
                 );
                 break;
             case 'playlist':
