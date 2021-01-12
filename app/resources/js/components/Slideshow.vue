@@ -17,17 +17,14 @@
             <ul>
                 <li
                     v-for="(item) in images"
-                    :key="item.id"
                     class="slide background"
-                    :class="{active: item.active, 'no-transition': !enableTransition}"
+                    :class="{active: item.active, previous: item.previous, 'no-transition': !enableTransition}"
                     :style="{ backgroundImage: 'url(\'' + encodeURI(item.path) + '\')' }"
-                >
-                </li>
+                />
                 <li
                     v-for="(item) in images"
-                    :key="item.id"
                     class="slide foreground"
-                    :class="{active: item.active, 'no-transition': !enableTransition}"
+                    :class="{active: item.active, previous: item.previous, 'no-transition': !enableTransition}"
                     :style="{ backgroundImage: 'url(\'' + encodeURI(item.path) + '\')' }"
                 />
             </ul>
@@ -91,38 +88,43 @@ export default {
             console.log("current function");
             axios.get('/api/queue/current')
                 .then(res => {
-                    let found = false, count = 0, foundIndex, currentImage;
-                    this.images.forEach(image => {
-                        if (image.id === res.data.id){
-                            image.active = true;
-                            currentImage = image;
-                            found = true;
-                            foundIndex=count;
-                        }else{
-                            image.active = false
-                        }
-                        count++;
-                    });
+                    const currentId = res.data.id;
+                    const newCurrentIndex = this.images.findIndex(item => {return item.id === currentId});
 
-                    if (found) {
-                        if (foundIndex >= this.images.length-1){
-                            //load next batch if last item is reached
-                            this.loadNextBatch();
-                        }else if (foundIndex === 0) {
-                            //load previous batch if last item is reached
-                            this.loadPreviousBatch();
+                    //deactivate current image and set previous flag
+                    this.images.map(item => {
+                        if (item.previous) {
+                            item.previous = false
                         }
-                    } else {
+                        if  (item.active){
+                            item.previous = true
+                        }
+                        item.active = false;
+                    })
+
+                    if (newCurrentIndex > 0){
+                        this.images[newCurrentIndex].active = true;
+                    }else{
                         const newImage = {
                             id: res.data.id,
                             path: res.data.file_path,
-                            active: true
+                            active: true,
+                            previous: true
                         };
-                        this.images.push(newImage)
-                        this.loadNextBatch();
-                        this.loadPreviousBatch();
+                        this.images.push(newImage);
                     }
+                    this.loadBatchesIfNecessary();
                 })
+        },
+        loadBatchesIfNecessary() {
+            const activeIndex = this.images.findIndex(item => { return item.active === true});
+
+            if (activeIndex <= 2) {
+                this.loadPreviousBatch();
+            }
+            if (activeIndex >= this.images.length - 2) {
+                this.loadNextBatch();
+            }
         },
         loadNextBatch() {
             axios.get('/api/queue/nextBatch?limit=' + this.batchSize)
@@ -134,7 +136,8 @@ export default {
                             this.images.push({
                                 id: imageItem.id,
                                 path: imageItem.file_path,
-                                active: false
+                                active: false,
+                                previous: false
                             })
                         }
                     });
@@ -147,7 +150,8 @@ export default {
                         const newItem = {
                             id: imageItem.id,
                             path: imageItem.file_path,
-                            active: false
+                            active: false,
+                            previous: false
                         };
                         const found = this.images.some(el => el.id === imageItem.id);
                         if (!found){
@@ -157,15 +161,9 @@ export default {
                 });
         },
         garbageCollection () {
-            let activeImageCount=0;
-            for (let i=0; i < this.images.length; i++) {
-                if (this.images[i].active){
-                    activeImageCount=i+1;
-                }
-            }
-            console.log(activeImageCount + "== " + this.batchSize * 2);
-            if ((activeImageCount) >= this.batchSize * 2) {
-                this.images.splice(0, this.batchSize*2-1);
+            let activeImageIndex= this.images.findIndex(item => { return item.active === true});
+            if ((activeImageIndex) >= this.batchSize * 3) {
+                this.images.splice(0, this.batchSize-1);
             }
         },
         setIntervals () {
@@ -337,7 +335,13 @@ export default {
 .slide.background.active {
     opacity: 1;
     z-index: 19;
-    height: var(--slide-time);
+    animation: zoom-in-and-out-background-image;
+    animation-duration: var(--slide-time);
+    animation-fill-mode: forwards;
+    -webkit-animation-fill-mode: forwards;
+}
+
+.slide.background.previous {
     animation: zoom-in-and-out-background-image;
     animation-duration: var(--slide-time);
     animation-fill-mode: forwards;
@@ -351,11 +355,20 @@ export default {
     background-color: transparent;
 }
 
-.slide.foreground.active{
+.slide.foreground.active {
     opacity: 1;
-    z-index: 30;
+    z-index: 20;
+    animation: zoom-in-and-out-foreground-image;
+    animation-timing-function: ease-in-out;
+    animation-duration: var(--slide-time);
+    animation-fill-mode: forwards;
+    -webkit-animation-fill-mode: forwards;
+}
+
+.slide.foreground.previous {
     animation: zoom-in-and-out-foreground-image;
     animation-duration: var(--slide-time);
+    animation-timing-function: ease-in;
     animation-fill-mode: forwards;
     -webkit-animation-fill-mode: forwards;
 }
@@ -393,11 +406,8 @@ export default {
     0% {
         transform: scale(1);
     }
-    50% {
-        transform: scale(1.2,1.2);
-    }
     100% {
-        transform: scale(1);
+        transform: scale(1.2,1.2);
     }
 }
 
@@ -405,11 +415,8 @@ export default {
     0% {
         transform: scale(1);
     }
-    50% {
-        transform: scale(1.04,1.04);
-    }
     100% {
-        transform: scale(1);
+        transform: scale(1.1,1.1);
     }
 }
 
