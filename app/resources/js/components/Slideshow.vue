@@ -1,5 +1,5 @@
 <template>
-    <div id="slideshow">
+    <div id="slideshow" :style="cssProps">
         <div id="command-info-wrapper">
             <div id="command-info">
                 <b-icon-pause-circle class="icon" :class="{active: commandInfo.pause}"></b-icon-pause-circle>
@@ -54,9 +54,20 @@ export default {
                 next: false,
                 play: false,
             },
+            settings: {
+                //slide time in seconds
+                imageSlideTime: 30
+            },
             images: []
 
         };
+    },
+    computed: {
+        cssProps() {
+            return {
+                '--slide-time': this.settings.imageSlideTime + 's'
+            }
+        }
     },
     created() {
         this.setIntervals();
@@ -160,7 +171,7 @@ export default {
         setIntervals () {
             clearInterval(this.slideshowInterval);
             clearInterval(this.pollCommandsInterval);
-            this.slideshowInterval = setInterval(() => this.triggerSlideshow(), 30000);
+            this.slideshowInterval = setInterval(() => this.triggerSlideshow(), (this.settings.imageSlideTime * 1000));
             this.pollCommandsInterval = setInterval(() => this.pollCommands(), 1000);
         },
         disableCommandInfos () {
@@ -326,7 +337,11 @@ export default {
 .slide.background.active {
     opacity: 1;
     z-index: 19;
-    animation: zoom-in-and-out-background-image 30s infinite ease-in-out;
+    height: var(--slide-time);
+    animation: zoom-in-and-out-background-image;
+    animation-duration: var(--slide-time);
+    animation-fill-mode: forwards;
+    -webkit-animation-fill-mode: forwards;
 }
 
 .slide.foreground {
@@ -338,8 +353,11 @@ export default {
 
 .slide.foreground.active{
     opacity: 1;
-    z-index: 20;
-    animation: zoom-in-and-out-foreground-image 30s infinite ease-in-out;
+    z-index: 30;
+    animation: zoom-in-and-out-foreground-image;
+    animation-duration: var(--slide-time);
+    animation-fill-mode: forwards;
+    -webkit-animation-fill-mode: forwards;
 }
 
 .slide.no-transition {
