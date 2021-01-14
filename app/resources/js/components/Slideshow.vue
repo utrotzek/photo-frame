@@ -109,7 +109,7 @@ export default {
                             id: res.data.id,
                             path: res.data.file_path,
                             active: true,
-                            previous: true
+                            previous: false
                         };
                         this.images.push(newImage);
                     }
@@ -342,10 +342,8 @@ export default {
 }
 
 .slide.background.previous {
-    animation: zoom-in-and-out-background-image;
-    animation-duration: var(--slide-time);
-    animation-fill-mode: forwards;
-    -webkit-animation-fill-mode: forwards;
+    z-index: 19;
+    transform: scale(1.2,1.2);
 }
 
 .slide.foreground {
@@ -366,11 +364,8 @@ export default {
 }
 
 .slide.foreground.previous {
-    animation: zoom-in-and-out-foreground-image;
-    animation-duration: var(--slide-time);
-    animation-timing-function: ease-in;
-    animation-fill-mode: forwards;
-    -webkit-animation-fill-mode: forwards;
+    z-index: 20;
+    transform: scale(1.1,1.1);
 }
 
 .slide.no-transition {
