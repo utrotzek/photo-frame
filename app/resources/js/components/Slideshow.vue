@@ -109,7 +109,7 @@ export default {
                             id: res.data.id,
                             path: res.data.file_path,
                             active: true,
-                            previous: false
+                            previous: true
                         };
                         this.images.push(newImage);
                     }
@@ -312,6 +312,10 @@ export default {
 }
 
 .slide {
+    -webkit-transition: opacity 6s;
+    -moz-transition: opacity 6s;
+    -o-transition: opacity 6s;
+    transition: opacity 6s;
     overflow: hidden;
     position: absolute;
     left: 0;
@@ -322,9 +326,6 @@ export default {
     padding: 40px;
 }
 
-.slide .previous {
-}
-
 .slide.background {
     background-size: 110%;
     background-repeat: no-repeat;
@@ -332,6 +333,7 @@ export default {
 }
 
 .slide.background.active {
+    opacity: 1;
     z-index: 19;
     animation: zoom-in-and-out-background-image;
     animation-duration: var(--slide-time);
@@ -356,7 +358,7 @@ export default {
 .slide.foreground.active {
     opacity: 1;
     z-index: 20;
-    animation: zoom-in-foreground-image;
+    animation: zoom-in-and-out-foreground-image;
     animation-timing-function: ease-in-out;
     animation-duration: var(--slide-time);
     animation-fill-mode: forwards;
@@ -364,8 +366,7 @@ export default {
 }
 
 .slide.foreground.previous {
-    transform: scale(1.1, 1.1);
-    animation: zoom-out-foreground-image;
+    animation: zoom-in-and-out-foreground-image;
     animation-duration: var(--slide-time);
     animation-timing-function: ease-in;
     animation-fill-mode: forwards;
@@ -377,7 +378,6 @@ export default {
     -moz-transition: none;
     -o-transition: none;
     transition: none;
-    animation: none!important;
 }
 
 
@@ -406,33 +406,17 @@ export default {
     0% {
         transform: scale(1);
     }
-    30% {
-        opacity: 1;
-    }
     100% {
         transform: scale(1.2,1.2);
     }
 }
 
-@keyframes zoom-in-foreground-image {
+@keyframes zoom-in-and-out-foreground-image {
     0% {
         transform: scale(1);
-        opacity: 0;
-    }
-    20% {
-        opacity: 1;
     }
     100% {
-        transform: scale(1.1, 1.1);
-    }
-}
-
-@keyframes zoom-out-foreground-image {
-    0% {
-        opacity: 1;
-    }
-    20% {
-        opacity: 0;
+        transform: scale(1.1,1.1);
     }
 }
 
