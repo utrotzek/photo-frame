@@ -85,23 +85,12 @@ export default {
     },
     methods: {
         loadCurrentImage() {
-            console.log("current function");
             axios.get('/api/queue/current')
                 .then(res => {
                     const currentId = res.data.id;
                     const newCurrentIndex = this.images.findIndex(item => {return item.id === currentId});
 
-                    //deactivate current image and set previous flag
-                    this.images.map(item => {
-                        if (item.previous) {
-                            item.previous = false
-                        }
-                        if  (item.active){
-                            item.previous = true
-                        }
-                        item.active = false;
-                    })
-
+                    this.updateImageFlags();
                     if (newCurrentIndex > 0){
                         this.images[newCurrentIndex].active = true;
                     }else{
@@ -115,6 +104,18 @@ export default {
                     }
                     this.loadBatchesIfNecessary();
                 })
+        },
+        updateImageFlags() {
+            const activeIndex = this.images.findIndex(item => { return item.active === true;});
+            const previousIndex = this.images.findIndex(item => { return item.previous === true;});
+            if (activeIndex !== -1){
+
+                this.images[activeIndex].previous = true;
+                this.images[activeIndex].active = false;
+            }
+            if (previousIndex !== -1){
+                this.images[previousIndex].previous = false;
+            }
         },
         loadBatchesIfNecessary() {
             const activeIndex = this.images.findIndex(item => { return item.active === true});
