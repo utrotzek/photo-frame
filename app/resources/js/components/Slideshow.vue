@@ -327,23 +327,16 @@ export default {
 }
 
 .slide.background {
-    background-size: 110%;
-    background-repeat: no-repeat;
+    z-index: 19;
+    background-size: 120%;
+    background-position: center;
+    background-repeat: repeat;
     -webkit-filter: blur(50px) contrast(105%);
 }
 
-.slide.background.active {
-    opacity: 1;
-    z-index: 19;
-    animation: zoom-in-and-out-background-image;
-    animation-duration: var(--slide-time);
-    animation-fill-mode: forwards;
-    -webkit-animation-fill-mode: forwards;
-}
-
+.slide.background.active,
 .slide.background.previous {
-    z-index: 19;
-    transform: scale(1.2,1.2);
+    opacity: 1;
 }
 
 .slide.foreground {
@@ -395,15 +388,6 @@ export default {
 #command-info .icon.active {
     display: block;
     animation: show-info-icon 1s;
-}
-
-@keyframes zoom-in-and-out-background-image {
-    0% {
-        transform: scale(1);
-    }
-    100% {
-        transform: scale(1.2,1.2);
-    }
 }
 
 @keyframes zoom-in-and-out-foreground-image {
