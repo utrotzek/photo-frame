@@ -335,8 +335,7 @@ export default {
     -webkit-filter: blur(50px) contrast(105%);
 }
 
-.slide.background.active,
-.slide.background.previous {
+.slide.background.active {
     opacity: 1;
 }
 
@@ -350,16 +349,10 @@ export default {
 .slide.foreground.active {
     opacity: 1;
     z-index: 20;
-    animation: zoom-in-and-out-foreground-image;
-    animation-timing-function: ease-in-out;
-    animation-duration: var(--slide-time);
-    animation-fill-mode: forwards;
-    -webkit-animation-fill-mode: forwards;
 }
 
 .slide.foreground.previous {
     z-index: 20;
-    transform: scale(1.1,1.1);
 }
 
 .slide.no-transition {
@@ -368,7 +361,6 @@ export default {
     -o-transition: none;
     transition: none;
 }
-
 
 #command-info .icon {
     color: $teal;
@@ -389,15 +381,6 @@ export default {
 #command-info .icon.active {
     display: block;
     animation: show-info-icon 1s;
-}
-
-@keyframes zoom-in-and-out-foreground-image {
-    0% {
-        transform: scale(1);
-    }
-    100% {
-        transform: scale(1.1,1.1);
-    }
 }
 
 @keyframes show-info-icon {
