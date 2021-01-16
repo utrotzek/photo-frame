@@ -328,18 +328,26 @@ export default {
 }
 
 .slide.background {
-    z-index: 19;
+    z-index: 15;
     background-size: 120%;
     background-position: center;
     background-repeat: repeat;
+    background-color: transparent;
     -webkit-filter: blur(50px) contrast(105%);
 }
 
 .slide.background.active {
     opacity: 1;
+    z-index: 16;
+}
+
+.slide.background.active {
+    opacity: 1;
+    z-index: 17;
 }
 
 .slide.foreground {
+    z-index: 20;
     background-size: contain;
     background-position: 50% 50%;
     background-repeat: no-repeat;
@@ -348,11 +356,11 @@ export default {
 
 .slide.foreground.active {
     opacity: 1;
-    z-index: 20;
+    z-index: 22;
 }
 
 .slide.foreground.previous {
-    z-index: 20;
+    z-index: 21;
 }
 
 .slide.no-transition {
