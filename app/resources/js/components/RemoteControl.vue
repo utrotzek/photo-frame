@@ -127,6 +127,10 @@
                 <b-collapse id="accordion-3" accordion="my-accordion" role="tabpanel">
                     <b-card-body>
                         <b-card-text><h3>Ordner auswählen</h3></b-card-text>
+                        <b-card-body>
+                            <AlbumSelector></AlbumSelector>
+                            <b-button v-b-modal.queue-order-modal block variant="primary" class="mt-2">Los</b-button>
+                        </b-card-body>
                     </b-card-body>
                 </b-collapse>
             </b-card>
@@ -177,8 +181,10 @@
 <script>
 import InlineSvg from "./InlineSvg";
 import moment from "moment";
+import AlbumSelector from "./tools/AlbumSelector";
+
 export default {
-    components: {InlineSvg},
+    components: {InlineSvg, AlbumSelector},
     data () {
         return {
             device: 'main',
