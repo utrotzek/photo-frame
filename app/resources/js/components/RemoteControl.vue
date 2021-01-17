@@ -267,7 +267,11 @@ export default {
                 action: action,
                 queue_title: queueTitle
             }
-            axios.put('/api/slideshow/triggerNextAction/' + this.device, actionParameter);
+            this.loading = true;
+            axios.put('/api/slideshow/triggerNextAction/' + this.device, actionParameter)
+                 .then(() => {
+                     this.loading = false;
+                 })
             this.loadSlideshowState();
         },
         startQueueByYear(random) {

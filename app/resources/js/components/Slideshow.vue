@@ -44,7 +44,6 @@ export default {
             pollCommandsInterval: null,
             slideshowInterval: null,
             pause: false,
-            commandsProcessing: false,
             enableTransition: true,
             message: '',
             commandInfo: {
@@ -57,6 +56,10 @@ export default {
             settings: {
                 //slide time in seconds
                 imageSlideTime: 30
+            },
+            locks: {
+                commandsProcessing: false,
+                slideshowProcessing: false
             },
             images: []
 
@@ -83,6 +86,14 @@ export default {
                 setTimeout(() => {
                     this.message = '';
                 }, 5000)
+            }
+        },
+        commandInfo: {
+            deep: true,
+            handler () {
+                setTimeout(() => {
+                        this.disableCommandInfos();
+                }, 1000);
             }
         }
     },
@@ -184,8 +195,8 @@ export default {
             this.commandInfo.restart = false;
         },
         pollCommands: function() {
-            if (!this.commandsProcessing){
-                this.commandsProcessing = true;
+            if (!this.locks.commandsProcessing){
+                this.locks.commandsProcessing = true;
                 axios.get('/api/slideshow/' + this.device)
                     .then(res => {
                         switch (res.data.action) {
@@ -200,9 +211,10 @@ export default {
                             this.triggerAction(res.data.next_action, res.data.next_queue_title);
                             axios.put('/api/slideshow/nextActionDone/' + this.device);
                         }
-                        this.commandsProcessing = false;
+                    })
+                    .finally(() => {
+                        this.locks.commandsProcessing = false;
                     });
-                this.disableCommandInfos();
             }
         },
         triggerAction (action, queueTitle) {
@@ -236,7 +248,7 @@ export default {
         },
         triggerSlideshow: function(){
             this.enableTransition = true;
-            if (!this.pause && !this.commandsProcessing) {
+            if (!this.pause && !this.locks.commandsProcessing) {
                 this.next()
                     .then(res => {
                         this.garbageCollection();
@@ -246,29 +258,37 @@ export default {
         setPause(enabled) {
             this.pause = enabled;
         },
+        triggerMove: function(direction) {
+            if (!this.locks.slideshowProcessing) {
+                this.locks.slideshowProcessing = true;
+                return new Promise((resolve, reject) => {
+                    axios.put('/api/queue/move', {direction: direction})
+                        .then(res => {
+                            if (direction !== 'restart'){
+                                this.loadCurrentImage();
+                            }
+                            resolve()
+                        })
+                        .finally(() => {
+                            this.locks.slideshowProcessing = false;
+                        });
+                });
+            }
+        },
         next: function() {
-            return new Promise((resolve, reject) => {
-                axios.put('/api/queue/move', {direction: 'forward'})
-                     .then(res => {
-                        this.loadCurrentImage()
-                        resolve()
-                     });
-            });
+            return this.triggerMove('forward');
         },
         prev: function() {
-            axios.put('/api/queue/move', {direction: 'backward'})
-                .then(res => {
-                    this.loadCurrentImage();
-                });
+            return this.triggerMove('backward');
         },
         restart: function() {
-            axios.put('/api/queue/move', {direction: 'restart'})
-                .then(res => {
-                    this.reloadImages('Fotoshow wird neu gestartet.');
-                });
+            return this.triggerMove('restart')
+            .then(res => {
+                this.reloadImages('Warteschlange wird neu gestartet.');
+            });
         },
         startQueue(title) {
-            axios.put('/api/queue/move', {direction: 'restart'})
+            return this.triggerMove('restart')
                 .then(res => {
                     this.reloadImages('Fotoshow ' + title + '\' wurde gestartet');
                 });
