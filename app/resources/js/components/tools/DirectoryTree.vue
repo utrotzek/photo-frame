@@ -1,5 +1,5 @@
 <template>
-    <div class="directory-tree tree-entry" :class="{selected: selected}"
+    <div class="directory-tree tree-entry" :class="{selected: node.selected}"
     >
         <div>
             <div class="title-wrapper">
@@ -12,7 +12,7 @@
                     {{ title }}
                 </div>
                 <div class="selection float-right" @click="toggleSelection">
-                    <b-icon-circle v-if="!selected"></b-icon-circle>
+                    <b-icon-circle v-if="!node.selected"></b-icon-circle>
                     <b-icon-check2-circle v-else></b-icon-check2-circle>
                 </div>
             </div>
@@ -20,9 +20,12 @@
                 v-if="showChildren"
                 v-for="node in nodes"
                 :key="node.path"
+                :node="node"
                 :nodes="node.nodes"
+                :selected="node.selected"
                 :title="node.title"
                 :depth="depth + 1"
+                @node-selected="nodeSelected"
             >
             </directory-tree>
         </div>
@@ -32,7 +35,7 @@
 <script>
 export default {
     name: "directory-tree",
-    props: ['title', 'nodes', 'depth'],
+    props: ['title', 'nodes', 'node', 'depth', 'selected'],
     computed: {
         indent() {
             return 'ml-'+this.depth * 2;
@@ -41,7 +44,6 @@ export default {
     data() {
         return {
             showChildren: false,
-            selected: false
         }
     },
     methods: {
@@ -49,7 +51,10 @@ export default {
             this.showChildren= !this.showChildren;
         },
         toggleSelection() {
-            this.selected= !this.selected;
+            this.$emit("node-selected", this.node.path, !this.node.selected)
+        },
+        nodeSelected(path, selected){
+            this.$emit('node-selected', path, selected)
         }
     }
 }
