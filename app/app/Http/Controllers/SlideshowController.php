@@ -53,6 +53,7 @@ class SlideshowController extends Controller
             $slideshow['queue_title'] = $slideshow['next_queue_title'];
             $slideshow['action'] = Slideshow::ACTION_PLAY;
         } elseif (
+            $slideshow['next_action'] === Slideshow::ACTION_RESTART or
             $slideshow['next_action'] === Slideshow::ACTION_NEXT or
             $slideshow['next_action'] === Slideshow::ACTION_PREV
         ) {

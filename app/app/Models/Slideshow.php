@@ -25,7 +25,7 @@ class Slideshow extends Model
     const ACTION_PREV = 'prev';
     const ACTION_NEXT = 'next';
     const ACTION_START_QUEUE = 'start_queue';
-    const ACTION_restart = 'restart';
+    const ACTION_RESTART = 'restart';
 
     public static function findByDevice($device): self
     {

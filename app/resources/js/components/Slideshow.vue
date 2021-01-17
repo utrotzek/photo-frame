@@ -2,6 +2,7 @@
     <div id="slideshow" :style="cssProps">
         <div id="command-info-wrapper">
             <div id="command-info">
+                <b-icon-arrow-counterclockwise class="icon" :class="{active: commandInfo.restart}"></b-icon-arrow-counterclockwise>
                 <b-icon-pause-circle class="icon" :class="{active: commandInfo.pause}"></b-icon-pause-circle>
                 <b-icon-play-circle class="icon" :class="{active: commandInfo.play}"></b-icon-play-circle>
                 <b-icon-skip-forward class="icon" :class="{active: commandInfo.next}"></b-icon-skip-forward>
@@ -10,7 +11,7 @@
         </div>
 
         <h1 class="info-message" :class="{'smooth': message}">
-            {{ message }} <b-icon-card-list></b-icon-card-list>
+            {{ message }}
         </h1>
 
         <div id="all_slides">
@@ -38,6 +39,7 @@ export default {
         return {
             device: 'main',
             batchSize: 4,
+            reloadTimeout: 5000,
             active:  0,
             pollCommandsInterval: null,
             slideshowInterval: null,
@@ -46,6 +48,7 @@ export default {
             enableTransition: true,
             message: '',
             commandInfo: {
+                restart: false,
                 pause: false,
                 prev: false,
                 next: false,
@@ -178,6 +181,7 @@ export default {
             this.commandInfo.pause = false;
             this.commandInfo.prev = false;
             this.commandInfo.play = false;
+            this.commandInfo.restart = false;
         },
         pollCommands: function() {
             if (!this.commandsProcessing){
@@ -207,6 +211,10 @@ export default {
                 case "next":
                     this.commandInfo.next = true;
                     this.next();
+                    break;
+                case "restart":
+                    this.commandInfo.restart = true;
+                    this.restart();
                     break;
                 case "prev":
                     this.commandInfo.prev = true;
@@ -253,19 +261,28 @@ export default {
                     this.loadCurrentImage();
                 });
         },
+        restart: function() {
+            axios.put('/api/queue/move', {direction: 'restart'})
+                .then(res => {
+                    this.reloadImages('Fotoshow wird neu gestartet.');
+                });
+        },
         startQueue(title) {
             axios.put('/api/queue/move', {direction: 'restart'})
                 .then(res => {
-                    this.images = [];
-                    this.setPause(false);
-                    this.message = 'Fotoshow ' + title + '\' wurde gestartet';
-
-                    setTimeout(() => {
-                        this.loadCurrentImage();
-                        this.loadPreviousBatch();
-                        this.loadNextBatch();
-                    }, 5000)
+                    this.reloadImages('Fotoshow ' + title + '\' wurde gestartet');
                 });
+        },
+        reloadImages(message) {
+            this.images = [];
+            this.setPause(false);
+            this.message = message;
+            setTimeout(() => {
+                this.loadCurrentImage();
+                this.loadPreviousBatch();
+                this.loadNextBatch();
+            }, this.reloadTimeout);
+
         }
     }
 };

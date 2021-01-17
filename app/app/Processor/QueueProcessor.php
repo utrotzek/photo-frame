@@ -33,12 +33,7 @@ class QueueProcessor
 
     public function restart()
     {
-        $current = Queue::findCurrent();
-        if ($current != null) {
-            $current['state'] = Queue::STATE_QUEUED;
-            $current->save();
-        }
-
+        Queue::query()->update(['state' => Queue::STATE_QUEUED]);
         $first = Queue::query()->first();
         $first['state'] = Queue::STATE_CURRENT;
         $first->save();
@@ -52,18 +47,12 @@ class QueueProcessor
             $this->restart();
             return;
         }
-
+        Queue::query()->update(['state' => Queue::STATE_QUEUED]);
         $next = $current->getNextItem();
-
         if ($next){
-            $current['state'] = QUEUE::STATE_DONE;
-            $current->save();
             $next['state'] = QUEUE::STATE_CURRENT;
             $next->save();
         }else {
-            $current['state'] = QUEUE::STATE_DONE;
-            $current->save();
-
             $first = Queue::findFirst();
             $first['state'] = QUEUE::STATE_CURRENT;
             $first->save();
@@ -80,8 +69,7 @@ class QueueProcessor
         $previous = $current->getPreviousItem();
 
         if ($previous){
-            $current['state'] = QUEUE::STATE_QUEUED;
-            $current->save();
+            Queue::query()->update(['state' => Queue::STATE_QUEUED]);
             $previous['state'] = QUEUE::STATE_CURRENT;
             $previous->save();
         }

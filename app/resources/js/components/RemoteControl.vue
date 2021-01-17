@@ -139,6 +139,11 @@
                     </button>
                 </div>
                 <div class="col">
+                    <button type="button" class="btn btn-secondary remote-button" @click="triggerAction('restart')">
+                        <b-icon-arrow-counterclockwise class="icon"></b-icon-arrow-counterclockwise>
+                    </button>
+                </div>
+                <div class="col">
                     <button
                         type="button"
                         class="btn btn-secondary remote-button"

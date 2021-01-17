@@ -20,7 +20,6 @@ class Queue extends Model
 
     const STATE_CURRENT = 'current';
     const STATE_QUEUED = 'queued';
-    const STATE_DONE = 'done';
 
     public function index(): BelongsTo
     {
@@ -101,10 +100,5 @@ class Queue extends Model
             return $this->newQuery()->where('id', '=', $this->parent_id)->first();
         }
         return null;
-    }
-
-    public static function getCurrentPosition(): int
-    {
-
     }
 }
