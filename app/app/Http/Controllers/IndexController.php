@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Aggregator\IndexDirectoriesAggregator;
 use App\Aggregator\IndexStatisticsAggregator;
 use App\Http\Resources\IndexState as IndexStateResource;
 use App\Models\Index;
@@ -36,6 +37,10 @@ class IndexController extends Controller
             default:
                 throw new \InvalidArgumentException('state not allowed');
         }
+    }
+
+    public function directories(Request $request) {
+        return new Response(IndexDirectoriesAggregator::getIndexedDirectories());
     }
 
     public function statistics(): Response

@@ -85,8 +85,12 @@ class QueueController extends Controller
                 break;
             case 'playlist':
                 throw new \Exception("Not implemented");
-            case 'folder':
-                throw new \Exception("Not implemented");
+            case 'albums':
+                $this->queueProcessor->generateQueueByAlbumList(
+                    $request->input('albumList'),
+                    $request->input('shuffle') ?? true
+                );
+                break;
             default:
                 return new Response(
                     sprintf(

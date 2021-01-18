@@ -33,6 +33,7 @@ Route::put('/slideshow/triggerNextAction/{device}', [SlideshowController::class,
 Route::put('/slideshow/nextActionDone/{device}', [SlideshowController::class, 'nextActionDone']);
 
 //index
+Route::get('/index/directories', [IndexController::class, 'directories']);
 Route::get('/index/state', [IndexController::class, 'state']);
 Route::put('/index/update', [IndexController::class, 'update']);
 Route::get('/index/statistics', [IndexController::class, 'statistics']);

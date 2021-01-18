@@ -9,6 +9,14 @@
             :key="node.path"
             @node-selected="nodeSelected"
         ></directory-tree>
+        <b-row>
+            <b-col>
+                <b-button block variant="primary" class="mt-2" @click="select">Los</b-button>
+            </b-col>
+            <b-col>
+                <b-button block variant="secondary" class="mt-2" @click="loadAlbumData">Auswahl löschen</b-button>
+            </b-col>
+        </b-row>
     </div>
 </template>
 
@@ -42,31 +50,56 @@ export default {
             }
         }
     },
+    mounted() {
+       this.loadAlbumData();
+    },
     methods: {
+        loadAlbumData() {
+            axios.get('/api/index/directories').then((res) => {
+                this.albums = res.data;
+            });
+        },
         nodeSelected(path, selected) {
-            console.log("selected:" + path);
             this.updateNodesRecursively(this.albums.nodes, path, selected);
         },
         updateNodesRecursively(nodes, selectedPath, selected) {
-            nodes.forEach((item) => {
-                if (item.nodes){
-                    this.updateNodesRecursively(item.nodes, selectedPath, selected);
-                }
-                if (item.path === selectedPath) {
-                    item.selected = selected;
-                    if (item.nodes){
+            if (Array.isArray(nodes)) {
+                nodes.forEach((item) => {
+                    if (Array.isArray(item.nodes)) {
+                        this.updateNodesRecursively(item.nodes, selectedPath, selected);
+                    }
+                    if (item.path === selectedPath) {
+                        item.selected = selected;
                         this.setSelectedRecursively(item.nodes, selected);
                     }
-                }
-            })
+                })
+            }
         },
         setSelectedRecursively(nodes, selected){
+            if (Array.isArray(nodes)){
+                nodes.forEach((item) => {
+                    if (Array.isArray(item.nodes)) {
+                        this.setSelectedRecursively(item.nodes, selected);
+                    }
+                    item.selected = selected;
+                });
+            }
+        },
+        select(){
+            const pathList = this.recursiveSelectPathList(this.albums.nodes);
+            this.$emit('selected', pathList)
+        },
+        recursiveSelectPathList(nodes) {
+            let selectedList = [];
+
             nodes.forEach((item) => {
-                if (item.nodes) {
-                    this.setSelectedRecursively(item.nodes, selected);
+                if (item.selected){
+                    selectedList.push(item.path)
+                }else if(Array.isArray(item.nodes)){
+                    selectedList = selectedList.concat(this.recursiveSelectPathList(item.nodes))
                 }
-                item.selected = selected;
             });
+            return selectedList;
         }
     }
 }

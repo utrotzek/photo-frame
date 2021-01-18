@@ -59,14 +59,25 @@
         <b-modal id="queue-order-modal" ref="queue-order-modal" centered title="Neue Playlist starten" hide-footer>
             <p>Eine neue playlist wird gestaret. Bitte wählen Sie aus, in welcher Reihenfolge die Bilder abgespielt werden sollen.</p>
             <div class="row">
+                <div class="col" v-if="queueMode === 'album'">
+                    <label for="album-title">Titel</label>
+                    <b-input
+                        id="album-title"
+                        v-model="queue.albumSelection.title"
+                        placeholder="Warteschlangen Titel"
+                        block
+                    ></b-input>
+                </div>
+            </div>
+            <div class="row">
                 <div class="col">
-                    <b-button variant="success" block @click="startQueueByYear(true)">Zufällig</b-button>
+                    <b-button variant="success" block @click="startQueue(true)">Zufällig</b-button>
                 </div>
                 <div class="col">
-                    <b-button variant="warning" block @click="startQueueByYear(false)">Chronologisch</b-button>
+                    <b-button variant="warning" block @click="startQueue(false)">Chronologisch</b-button>
                 </div>
                 <div class="col">
-                    <b-button variant="danger " block @click="hideQueueModal">Abbrechen</b-button>
+                    <b-button variant="danger " block @click="abortQueue">Abbrechen</b-button>
                 </div>
             </div>
         </b-modal>
@@ -103,7 +114,7 @@
                                 </select>
                             </div>
                             <div class="col">
-                                <b-button v-b-modal.queue-order-modal block variant="primary" >Los</b-button>
+                                <b-button block variant="primary" @click="yearSelected" >Los</b-button>
                             </div>
                         </div>
                     </b-card-body>
@@ -113,12 +124,11 @@
                 <b-card-header header-tag="header" class="p-1" role="tab">
                     <b-button block v-b-toggle.accordion-3 variant="outline-success">Album auswählen</b-button>
                 </b-card-header>
-                <b-collapse id="accordion-3" accordion="my-accordion" role="tabpanel">
+                <b-collapse id="accordion-3" class="album-selector" accordion="my-accordion" role="tabpanel">
                     <b-card-body>
                         <b-card-text><h3>Album auswählen</h3></b-card-text>
                         <b-card-body>
-                            <AlbumSelector></AlbumSelector>
-                            <b-button v-b-modal.queue-order-modal block variant="primary" class="mt-2">Los</b-button>
+                            <AlbumSelector :key="albumSelectorKey" @selected="albumsSelected"></AlbumSelector>
                         </b-card-body>
                     </b-card-body>
                 </b-collapse>
@@ -182,6 +192,9 @@ import InlineSvg from "./InlineSvg";
 import moment from "moment";
 import AlbumSelector from "./tools/AlbumSelector";
 
+const QUEUE_MODE_YEAR = 'year';
+const QUEUE_MODE_ALBUM = 'album';
+
 export default {
     components: {InlineSvg, AlbumSelector},
     data () {
@@ -191,7 +204,9 @@ export default {
             errorMessage: '',
             loading: false,
             pendingAction: false,
+            queueMode: null,
 
+            albumSelectorKey: 0,
             index: {
                 allYeas: []
             },
@@ -199,6 +214,10 @@ export default {
                 yearSelection: {
                     from: '',
                     to: ''
+                },
+                albumSelection: {
+                    albumList: [],
+                    title: ''
                 },
                 statistics: {
                     total: 0,
@@ -250,18 +269,36 @@ export default {
                     }
                 });
         },
+        yearSelected() {
+            this.queueMode = QUEUE_MODE_YEAR;
+            this.showQueueModal();
+        },
+        albumsSelected(albums) {
+            this.queueMode = QUEUE_MODE_ALBUM;
+            this.queue.albumSelection.albumList =  albums;
 
+            if (this.queue.albumSelection.albumList.length  === 1){
+                const path = this.queue.albumSelection.albumList[0];
+                this.queue.albumSelection.title = String(path).substring(path.lastIndexOf('/') + 1);
+            } else {
+                this.queue.albumSelection.title = '';
+            }
+
+            this.showQueueModal();
+        },
         loadYears() {
             axios.get('/api/index/years')
                  .then(res => {
                      this.index.allYeas = res.data;
-
-                     if (res.data.length > 0) {
-                         const highestYear = res.data[res.data.length -1];
-                         this.queue.yearSelection.from = highestYear;
-                         this.queue.yearSelection.to = highestYear;
-                     }
+                     this.selectLatestYears();
                  });
+        },
+        selectLatestYears() {
+            if (this.index.allYeas > 0) {
+                const highestYear = this.index.allYeas[this.index.allYeas -1];
+                this.queue.yearSelection.from = highestYear;
+                this.queue.yearSelection.to = highestYear;
+            }
         },
         hideAlert() {
             this.successMessage = '';
@@ -279,20 +316,39 @@ export default {
                  })
             this.loadSlideshowState();
         },
-        startQueueByYear(random) {
-            const queueData = {
-                type: 'year',
-                fromYear: this.queue.yearSelection.from,
-                toYear: this.queue.yearSelection.to,
-                shuffle: random
-            };
+        startQueue(random) {
+            let queueData = null, message = '', queueTitle = '', defaultTitle = '';
+            switch (this.queueMode){
+                case QUEUE_MODE_YEAR:
+                    queueTitle = 'Fotos von ' + this.queue.yearSelection.from + ' bis ' + this.queue.yearSelection.to;
+                    queueData = {
+                        type: 'year',
+                        fromYear: this.queue.yearSelection.from,
+                        toYear: this.queue.yearSelection.to,
+                        shuffle: random
+                    };
+                    break;
+                case QUEUE_MODE_ALBUM:
+                    if (this.queue.albumSelection.albumList.length > 1) {
+                        defaultTitle = this.queue.albumSelection.albumList.length + " Alben";
+                    }else{
+                        defaultTitle = "1 Album";
+                    }
+                    queueTitle = (this.queue.albumSelection.title === '' ? defaultTitle: this.queue.albumSelection.title);
+                    queueData = {
+                        type: 'albums',
+                        albumList: this.queue.albumSelection.albumList,
+                        shuffle: random,
+                        title: queueTitle
+                    };
+                    break;
+            }
             this.loading = true;
             this.hideQueueModal();
             axios.post('/api/queue/create', queueData)
                 .then(() => {
                     this.errorMessage = '';
-                    this.successMessage = 'Eine Warteschlange von ' + this.queue.yearSelection.from + ' bis ' + this.queue.yearSelection.to + ' wurde erfolgreich erstellt.';
-                    const queueTitle = 'Fotos von ' + this.queue.yearSelection.from + ' bis ' + this.queue.yearSelection.to;
+                    this.successMessage = 'Eine Warteschlange mit dem Titel "' + queueTitle + '" wurde erfolgreich erstellt.';
                     this.triggerAction('start_queue', queueTitle);
                 })
                 .catch(error => {
@@ -302,6 +358,17 @@ export default {
                 .finally(res => {
                     this.loading = false;
                 });
+        },
+        abortQueue() {
+            this.hideQueueModal();
+        },
+        clearData() {
+            this.queue.albumSelection = [];
+            this.selectLatestYears();
+            this.albumSelectorKey=!this.albumSelectorKey;
+        },
+        showQueueModal() {
+            this.$refs['queue-order-modal'].show();
         },
         hideQueueModal() {
             this.$refs['queue-order-modal'].hide()
@@ -388,5 +455,9 @@ export default {
     }
     .col {
         padding: 2px;
+    }
+
+    .album-selector .card-body {
+        padding: 0.6em;
     }
 </style>

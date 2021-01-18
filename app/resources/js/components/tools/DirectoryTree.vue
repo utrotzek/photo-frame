@@ -3,15 +3,16 @@
     >
         <div>
             <div class="title-wrapper">
-                <div class="title" :class="indent">
-                    <span v-if="nodes" @click="toggleChildren">
+                <div class="icon" :class="indent" @click="toggleChildren">
+                    <span v-if="nodes">
                         <b-icon-plus-circle-fill class="mr-2" v-if="!showChildren"></b-icon-plus-circle-fill>
                         <b-icon-dash-circle-fill class="mr-2" v-else></b-icon-dash-circle-fill>
                     </span>
-                    <span class="empty-icon mr-2" v-else>&nbsp;</span>
+                </div>
+                <div class="title" :class="indent" @click="toggleChildren">
                     {{ title }}
                 </div>
-                <div class="selection mr-2 float-right" @click="toggleSelection">
+                <div class="selection" @click="toggleSelection">
                     <b-icon-circle v-if="!node.selected"></b-icon-circle>
                     <b-icon-check2-circle v-else></b-icon-check2-circle>
                 </div>
@@ -41,7 +42,7 @@ export default {
             return 'ml-'+this.depth * 2;
         },
         childSelected() {
-            if (!this.node.selected && this.nodes) {
+            if (!this.node.selected && Array.isArray(this.nodes)) {
                 return this.recursiveNodeChildSelected(this.nodes);
             }
             return false;
@@ -64,15 +65,17 @@ export default {
         },
         recursiveNodeChildSelected(nodes){
             let i=0;
-            if (nodes){
+            if (Array.isArray(nodes)){
                 for(i=0; i < nodes.length;i++){
                     let item=nodes[i];
 
                     if (item.selected){
                         return true;
                     }else{
-                        if (item.nodes && item.nodes.length > 0){
-                            return this.recursiveNodeChildSelected(item.nodes);
+                        if (Array.isArray(item.nodes)){
+                            if (this.recursiveNodeChildSelected(item.nodes)){
+                                return true;
+                            }
                         }
                     }
                 }
@@ -91,6 +94,8 @@ export default {
         display: inline-block;
     }
     .tree-entry .title-wrapper {
+        width: 100%;
+        position: relative;
         cursor: pointer;
         border-bottom: 1px solid white;
     }
@@ -103,10 +108,21 @@ export default {
     .tree-entry .selection {
         font-size: 1.2em;
         width: 2em;
+        position: absolute;
+        right: 0;
+        top: 0
     }
+
+    .tree-entry .icon {
+        position: absolute;
+        left:7px;
+        top:14px;
+    }
+
     .tree-entry .title {
         font-size: 1.2em;
         margin-right: 2em;
+        padding-left: 2em;
     }
 
     .tree-entry {
