@@ -1,5 +1,5 @@
 <template>
-    <div class="directory-tree tree-entry" :class="{selected: node.selected}"
+        <div class="directory-tree tree-entry" :class="{selected: node.selected, 'child-selected': childSelected}"
     >
         <div>
             <div class="title-wrapper">
@@ -11,7 +11,7 @@
                     <span class="empty-icon mr-2" v-else>&nbsp;</span>
                     {{ title }}
                 </div>
-                <div class="selection float-right" @click="toggleSelection">
+                <div class="selection mr-2 float-right" @click="toggleSelection">
                     <b-icon-circle v-if="!node.selected"></b-icon-circle>
                     <b-icon-check2-circle v-else></b-icon-check2-circle>
                 </div>
@@ -39,6 +39,12 @@ export default {
     computed: {
         indent() {
             return 'ml-'+this.depth * 2;
+        },
+        childSelected() {
+            if (!this.node.selected && this.nodes) {
+                return this.recursiveNodeChildSelected(this.nodes);
+            }
+            return false;
         }
     },
     data() {
@@ -55,6 +61,23 @@ export default {
         },
         nodeSelected(path, selected){
             this.$emit('node-selected', path, selected)
+        },
+        recursiveNodeChildSelected(nodes){
+            let i=0;
+            if (nodes){
+                for(i=0; i < nodes.length;i++){
+                    let item=nodes[i];
+
+                    if (item.selected){
+                        return true;
+                    }else{
+                        if (item.nodes && item.nodes.length > 0){
+                            return this.recursiveNodeChildSelected(item.nodes);
+                        }
+                    }
+                }
+            }
+            return false;
         }
     }
 }
@@ -78,9 +101,11 @@ export default {
     }
 
     .tree-entry .selection {
+        font-size: 1.2em;
         width: 2em;
     }
     .tree-entry .title {
+        font-size: 1.2em;
         margin-right: 2em;
     }
 
@@ -91,5 +116,9 @@ export default {
 
     .tree-entry.selected{
         background-color: $success;
+    }
+
+    .tree-entry.child-selected{
+        background-color: $yellow;
     }
 </style>

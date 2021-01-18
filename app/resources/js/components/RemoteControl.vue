@@ -111,26 +111,25 @@
             </b-card>
             <b-card no-body class="mb-1">
                 <b-card-header header-tag="header" class="p-1" role="tab">
+                    <b-button block v-b-toggle.accordion-3 variant="outline-success">Album auswählen</b-button>
+                </b-card-header>
+                <b-collapse id="accordion-3" accordion="my-accordion" role="tabpanel">
+                    <b-card-body>
+                        <b-card-text><h3>Album auswählen</h3></b-card-text>
+                        <b-card-body>
+                            <AlbumSelector></AlbumSelector>
+                            <b-button v-b-modal.queue-order-modal block variant="primary" class="mt-2">Los</b-button>
+                        </b-card-body>
+                    </b-card-body>
+                </b-collapse>
+            </b-card>
+            <b-card no-body class="mb-1">
+                <b-card-header header-tag="header" class="p-1" role="tab">
                     <b-button block v-b-toggle.accordion-2 variant="outline-success">Playliste auswählen</b-button>
                 </b-card-header>
                 <b-collapse id="accordion-2" accordion="my-accordion" role="tabpanel">
                     <b-card-body>
                         <b-card-text><h3>Playlist auswählen</h3></b-card-text>
-                    </b-card-body>
-                </b-collapse>
-            </b-card>
-
-            <b-card no-body class="mb-1">
-                <b-card-header header-tag="header" class="p-1" role="tab">
-                    <b-button block v-b-toggle.accordion-3 variant="outline-success">Ordner auswählen</b-button>
-                </b-card-header>
-                <b-collapse id="accordion-3" accordion="my-accordion" role="tabpanel">
-                    <b-card-body>
-                        <b-card-text><h3>Ordner auswählen</h3></b-card-text>
-                        <b-card-body>
-                            <AlbumSelector></AlbumSelector>
-                            <b-button v-b-modal.queue-order-modal block variant="primary" class="mt-2">Los</b-button>
-                        </b-card-body>
                     </b-card-body>
                 </b-collapse>
             </b-card>
