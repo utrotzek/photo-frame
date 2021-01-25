@@ -6,11 +6,11 @@ namespace App\Processor;
 use App\Exceptions\QueueGenerationException;
 use App\Models\Index;
 use App\Models\Queue;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 
 class QueueProcessor
 {
-
     public function generateQueueByYear(?int $fromYear, ?int $toYear, ?array $excludes, bool $shuffle = true)
     {
         $queryBuilder =Index::query();
@@ -21,14 +21,18 @@ class QueueProcessor
             $queryBuilder->where('year', '<=', $toYear);
         }
 
-        $queryBuilder->orderBy('path');
-        $queryBuilder->orderBy('file_name');
-        //TODO: order by date (date is missing currently)
-        $indexResult = $queryBuilder->get();
-        if (!$indexResult) {
-            throw new QueueGenerationException('Error while generating the queue (no index entries found)');
+        $this->createQueueByQueryBuilder($queryBuilder, $shuffle);
+    }
+
+    public function generateQueueByAlbumList(array $albumList, bool $shuffle)
+    {
+        $queryBuilder = Index::query();
+
+        foreach ($albumList as $album){
+            $internalPath = str_replace('/images', config('slideshow.imagePath'), $album);
+            $queryBuilder = $queryBuilder->orWhere('path', 'LIKE', '\\'.$internalPath.'%');
         }
-        $this->createQueue($indexResult, $shuffle);
+        $this->createQueueByQueryBuilder($queryBuilder, $shuffle);
     }
 
     public function restart()
@@ -75,10 +79,20 @@ class QueueProcessor
         }
     }
 
+    protected function createQueueByQueryBuilder(Builder $queryBuilder, bool $shuffle){
+        $queryBuilder->orderBy('path');
+        $queryBuilder->orderBy('file_name');
+        $indexResult = $queryBuilder->get();
+        if (!$indexResult) {
+            throw new QueueGenerationException('Error while generating the queue (no index entries found)');
+        }
+        $this->createQueueByCollection($indexResult, $shuffle);
+    }
+
     /**
      * Generates a new queue and writes them to the database
      */
-    protected function createQueue(Collection $indexResult, bool $shuffle = true)
+    protected function createQueueByCollection(Collection $indexResult, bool $shuffle = true)
     {
         $indexArray = [];
         if ($indexResult){
@@ -105,5 +119,4 @@ class QueueProcessor
         Queue::query()->insert($data);
 
     }
-
 }

@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Utility\PathUtility;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
@@ -31,7 +32,7 @@ class Index extends Model
     }
 
     public function getPublicFilePath() {
-        $publicPath = str_replace(config('slideshow.imagePath'), '/images', $this->path);
+        $publicPath = PathUtility::getPublicPath($this->path);
         return "{$publicPath}";
     }
 

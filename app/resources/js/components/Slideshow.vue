@@ -290,7 +290,7 @@ export default {
         startQueue(title) {
             return this.triggerMove('restart')
                 .then(res => {
-                    this.reloadImages('Fotoshow ' + title + '\' wurde gestartet');
+                    this.reloadImages('Fotoshow \'' + title + '\' wurde gestartet');
                 });
         },
         reloadImages(message) {
