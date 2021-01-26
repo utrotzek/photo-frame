@@ -36,7 +36,7 @@ RUN add-apt-repository ppa:ondrej/php && \
         php${PHP_VERSION}-ctype \
         php${PHP_VERSION}-bcmath \
         php${PHP_VERSION}-xdebug \
-        libapache2-mod-php
+        libapache2-mod-php${PHP_VERSION}
 
 RUN a2dissite 000-default
 RUN a2enmod rewrite
