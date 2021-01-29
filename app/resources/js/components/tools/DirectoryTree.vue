@@ -1,7 +1,6 @@
 <template>
-        <div class="directory-tree tree-entry" :class="{selected: node.selected, 'child-selected': childSelected}"
-    >
-        <div>
+    <div class="directory-tree tree-entry" :class="{selected: node.selected, 'child-selected': childSelected}">
+        <div v-if="node.visible">
             <div class="title-wrapper">
                 <div class="icon" :class="indent" @click="toggleChildren">
                     <span v-if="nodes">

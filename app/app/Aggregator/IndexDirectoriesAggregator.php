@@ -52,7 +52,8 @@ class IndexDirectoriesAggregator
                     $currentTree[$pathToken] = [
                         'title' => $pathToken,
                         'path' => $subPath,
-                        'selected' => false
+                        'selected' => false,
+                        'visible' => true
                     ];
                 }
                 $currentTree = &$currentTree[$pathToken]['nodes'];
@@ -62,7 +63,8 @@ class IndexDirectoriesAggregator
             $currentTree[$pathToken] = [
                 'title' => $pathToken,
                 'path' => $subPath,
-                'selected' => false
+                'selected' => false,
+                'visible' => true
             ];
             unset($currentTree);
         }

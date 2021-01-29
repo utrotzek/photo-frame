@@ -2,6 +2,11 @@
     <div class="album-selector pr-3 pl-3">
         <b-row>
             <b-col>
+                <search @searched="searched" ></search>
+            </b-col>
+        </b-row>
+        <b-row>
+            <b-col>
                 <directory-tree
                     :nodes="node.nodes"
                     :node="node"
@@ -26,9 +31,10 @@
 
 <script>
 import DirectoryTree from "./DirectoryTree";
+import Search from "./Search";
 export default {
     name: 'album-selector',
-    components: {DirectoryTree},
+    components: {DirectoryTree, Search},
     data () {
         return {
             albums: {
@@ -104,6 +110,38 @@ export default {
                 }
             });
             return selectedList;
+        },
+        searched(termin) {
+            if (Array.isArray(this.albums.nodes)){
+                this.showFoundAlbumsRecursive(this.albums.nodes, termin);
+            }
+        },
+        //searches recursively for the given title and sets the "visible" attribute for the node
+        showFoundAlbumsRecursive(nodes, term){
+            let found = false, anyFound = 0, i = 0, foundSub = false;
+
+            const reg = new RegExp(".*" + term + ".*", "gi");
+
+            nodes.forEach((item) => {
+                if (term === ""){
+                    found = true;
+                }
+                if (Array.isArray(item.nodes)){
+                    foundSub = this.showFoundAlbumsRecursive(item.nodes, term);
+                }
+
+                if (foundSub){
+                    found = true;
+                }else {
+                    found = !!item.title.match(reg);
+                }
+
+                if (found && !anyFound){
+                    anyFound = true;
+                }
+                item.visible = found;
+            });
+            return anyFound;
         }
     }
 }
