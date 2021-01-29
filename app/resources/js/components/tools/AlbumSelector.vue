@@ -1,14 +1,18 @@
 <template>
-    <div class="album-selector">
-        <directory-tree
-            :nodes="node.nodes"
-            :node="node"
-            :title="node.title"
-            :depth="0"
-            v-for="node in albums.nodes"
-            :key="node.path"
-            @node-selected="nodeSelected"
-        ></directory-tree>
+    <div class="album-selector pr-3 pl-3">
+        <b-row>
+            <b-col>
+                <directory-tree
+                    :nodes="node.nodes"
+                    :node="node"
+                    :title="node.title"
+                    :depth="0"
+                    v-for="node in albums.nodes"
+                    :key="node.path"
+                    @node-selected="nodeSelected"
+                ></directory-tree>
+            </b-col>
+        </b-row>
         <b-row>
             <b-col>
                 <b-button block variant="primary" class="mt-2" @click="select">Los</b-button>
