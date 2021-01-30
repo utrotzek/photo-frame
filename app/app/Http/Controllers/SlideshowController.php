@@ -37,14 +37,22 @@ class SlideshowController extends Controller
         $slideshow = Slideshow::findByDevice($device);
 
         try {
-            if ($action === Slideshow::ACTION_START_QUEUE) {
-                if (!$request->has('queue_title')) {
-                    return new Response('When a new queue start will be triggered the parameter queueTitle is mandatory');
-                }
-                $triggerHandler->triggerStartQueue($request->input('queue_title'), $slideshow);
+            switch ($action){
+                case Slideshow::ACTION_START_QUEUE:
+                    if (!$request->has('queue_title')) {
+                        return new Response('When a new queue start will be triggered the parameter queueTitle is mandatory');
+                    }
+                    $triggerHandler->triggerStartQueue($request->input('queue_title'), $slideshow);
+                    break;
+                case Slideshow::ACTION_UPDATE_SETTINGS_DURATION:
+                    if (!$request->has('duration')) {
+                        return new Response('You have to provide the duration to be set');
+                    }
+                    $triggerHandler->triggerUpdateDuration($slideshow, $request->input('duration'));
+                    break;
+                default:
+                    $triggerHandler->triggerNextAction($action, $slideshow);
             }
-
-            $triggerHandler->triggerNextAction($action, $slideshow);
         } catch (InvalidNextActionException $exception) {
             return new Response($exception->getMessage(), 500);
         }

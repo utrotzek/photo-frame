@@ -7,6 +7,7 @@
                 <b-icon-play-circle class="icon" :class="{active: commandInfo.play}"></b-icon-play-circle>
                 <b-icon-skip-forward class="icon" :class="{active: commandInfo.next}"></b-icon-skip-forward>
                 <b-icon-skip-backward class="icon" :class="{active: commandInfo.prev}"></b-icon-skip-backward>
+                <b-icon-clock class="icon" :class="{active: commandInfo.duration}"></b-icon-clock>
             </div>
         </div>
 
@@ -34,6 +35,15 @@
 </template>
 
 <script>
+//TODO: centralize this
+const SLIDESHOW_ACTION_PLAY = 'play';
+const SLIDESHOW_ACTION_STOP = 'stop';
+const SLIDESHOW_ACTION_PREV = 'prev';
+const SLIDESHOW_ACTION_NEXT = 'next';
+const SLIDESHOW_ACTION_START_QUEUE = 'start_queue';
+const SLIDESHOW_ACTION_RESTART = 'restart';
+const SLIDESHOW_ACTION_UPDATE_SETTINGS_DURATION = 'settings_duration';
+
 export default {
     data () {
         return {
@@ -52,6 +62,7 @@ export default {
                 prev: false,
                 next: false,
                 play: false,
+                duration: false,
             },
             settings: {
                 //slide time in seconds
@@ -69,6 +80,19 @@ export default {
         cssProps() {
             return {
                 '--slide-time': this.settings.imageSlideTime + 's'
+            }
+        },
+        //TODO: remove redundancy (is also defined in remote control component
+        durationOutput() {
+            let duration = this.settings.imageSlideTime;
+
+            if (duration < 60){
+                return duration + " Sekunden";
+            }else{
+                const minutes = Math.floor(duration / 60);
+                const minuteVerb = (minutes > 1) ? 'Minuten': 'Minute';
+                const seconds = (duration - minutes * 60).toLocaleString('de-DE', {minimumIntegerDigits: 2, useGrouping: false});
+                return minutes.toString() + ":" + seconds.toString() + " " + minuteVerb;
             }
         }
     },
@@ -193,6 +217,7 @@ export default {
             this.commandInfo.prev = false;
             this.commandInfo.play = false;
             this.commandInfo.restart = false;
+            this.commandInfo.duration = false;
         },
         pollCommands: function() {
             if (!this.locks.commandsProcessing){
@@ -208,7 +233,7 @@ export default {
                                 break;
                         }
                         if (res.data.next_action !== null) {
-                            this.triggerAction(res.data.next_action, res.data.next_queue_title);
+                            this.triggerAction(res.data.next_action, res.data.next_queue_title, res.data.next_duration);
                             axios.put('/api/slideshow/nextActionDone/' + this.device);
                         }
                     })
@@ -217,7 +242,8 @@ export default {
                     });
             }
         },
-        triggerAction (action, queueTitle) {
+        //TODO: refactor this
+        triggerAction (action, queueTitle, duration) {
             this.enableTransition = false;
             switch (action) {
                 case "next":
@@ -240,9 +266,9 @@ export default {
                     this.commandInfo.play = true;
                     this.setPause(false);
                     break;
-                case "start_queue":
-                    this.startQueue(queueTitle)
-
+                case SLIDESHOW_ACTION_UPDATE_SETTINGS_DURATION:
+                    this.updateDuration(duration);
+                    break;
             }
             this.setIntervals();
         },
@@ -253,6 +279,14 @@ export default {
                     .then(res => {
                         this.garbageCollection();
                     })
+            }
+        },
+        updateDuration(duration) {
+            const changed = this.settings.imageSlideTime !== duration;
+            this.settings.imageSlideTime = duration;
+            if (changed) {
+                this.commandInfo.duration = true;
+                this.message = 'Die Geschwindigkeit wurde auf ' + this.durationOutput + ' geändert';
             }
         },
         setPause(enabled) {

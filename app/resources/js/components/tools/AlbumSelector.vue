@@ -1,5 +1,5 @@
 <template>
-    <div class="album-selector pr-3 pl-3">
+    <div class="album-selector">
         <b-row>
             <b-col>
                 <search @searched="searched" ></search>
@@ -20,10 +20,10 @@
         </b-row>
         <b-row>
             <b-col>
-                <b-button block variant="primary" class="mt-2" @click="select">Los</b-button>
-            </b-col>
-            <b-col>
-                <b-button block variant="secondary" class="mt-2" @click="loadAlbumData">Auswahl löschen</b-button>
+                <b-button-group class="d-flex">
+                    <b-button block variant="primary" class="mt-2" @click="select">Los</b-button>
+                    <b-button block variant="secondary" class="mt-2" @click="loadAlbumData">Auswahl löschen</b-button>
+                </b-button-group>
             </b-col>
         </b-row>
     </div>

@@ -1,7 +1,13 @@
 <template>
-    <div id="remote-control">
-        <h1><b-icon-controller class="d-none d-sm-inline las"></b-icon-controller> Fernbedienung</h1>
-
+    <div id="remote-control" class="container-fluid">
+        <b-row>
+            <b-col>
+                <h1><b-icon-controller class="d-none d-sm-inline las"></b-icon-controller> Fernbedienung</h1>
+            </b-col>
+            <b-col class="text-right">
+                <button class="btn btn-secondary" @click="showSettings"><b-icon-gear></b-icon-gear></button>
+            </b-col>
+        </b-row>
         <div class="messages alert alert-success" :class="{'slide': successMessage}">
             {{ successMessage }}
         </div>
@@ -56,6 +62,25 @@
         </div>
 
         <h3>Andere Fotos abspielen</h3>
+
+        <b-modal id="settings-modal" ref="settings-modal" centeredt title="Einstellungen" @ok="saveSettings">
+            <b-form-group label="Geschwindigkeit">
+                <b-input-group>
+                    <b-form-input
+                        id="slideshow-duration"
+                        v-model="slideshow.duration"
+                        type="range"
+                        number
+                        min="10"
+                        max="600"
+                        step="10"
+                    ></b-form-input>
+                    <b-input-group-append is-text class="text-monospace">
+                        {{ durationOutput }}
+                    </b-input-group-append>
+                </b-input-group>
+            </b-form-group>
+        </b-modal>
         <b-modal id="queue-order-modal" ref="queue-order-modal" centered title="Neue Playlist starten" hide-footer>
             <p>Eine neue playlist wird gestaret. Bitte wählen Sie aus, in welcher Reihenfolge die Bilder abgespielt werden sollen.</p>
             <div class="row">
@@ -147,12 +172,12 @@
         <div id="remote-control-bar" class="footer">
             <div class="row">
                 <div class="col">
-                    <button type="button" class="btn btn-secondary remote-button" @click="triggerAction('prev')">
+                    <button type="button" class="btn btn-secondary remote-button" @click="triggerActionSimple('prev')">
                         <b-icon-skip-backward class="icon"></b-icon-skip-backward>
                     </button>
                 </div>
                 <div class="col">
-                    <button type="button" class="btn btn-secondary remote-button" @click="triggerAction('restart')">
+                    <button type="button" class="btn btn-secondary remote-button" @click="triggerActionSimple('restart')">
                         <b-icon-arrow-counterclockwise class="icon"></b-icon-arrow-counterclockwise>
                     </button>
                 </div>
@@ -160,7 +185,7 @@
                     <button
                         type="button"
                         class="btn btn-secondary remote-button"
-                        @click="triggerAction('play')"
+                        @click="triggerActionSimple('play')"
                         v-if="slideshow.state === 'pause'"
                     >
                         <b-icon-pause-circle class="icon"></b-icon-pause-circle>
@@ -169,7 +194,7 @@
                     <button
                         type="button"
                         class="btn btn-secondary remote-button"
-                        @click="triggerAction('pause')"
+                        @click="triggerActionSimple('pause')"
                         v-else
                     >
                         <b-icon-play-circle class="icon"></b-icon-play-circle>
@@ -178,7 +203,7 @@
 
                 </div>
                 <div class="col">
-                    <button type="button" class="btn btn-secondary remote-button" @click="triggerAction('next')">
+                    <button type="button" class="btn btn-secondary remote-button" @click="triggerActionSimple('next')">
                         <b-icon-skip-forward class="icon"></b-icon-skip-forward>
                     </button>
                 </div>
@@ -191,6 +216,14 @@
 import InlineSvg from "./InlineSvg";
 import moment from "moment";
 import AlbumSelector from "./tools/AlbumSelector";
+
+const SLIDESHOW_ACTION_PLAY = 'play';
+const SLIDESHOW_ACTION_STOP = 'stop';
+const SLIDESHOW_ACTION_PREV = 'prev';
+const SLIDESHOW_ACTION_NEXT = 'next';
+const SLIDESHOW_ACTION_START_QUEUE = 'start_queue';
+const SLIDESHOW_ACTION_RESTART = 'restart';
+const SLIDESHOW_ACTION_UPDATE_SETTINGS_DURATION = 'settings_duration';
 
 const QUEUE_MODE_YEAR = 'year';
 const QUEUE_MODE_ALBUM = 'album';
@@ -229,7 +262,8 @@ export default {
             },
             slideshow: {
                 state: null,
-                queueTitle: ''
+                queueTitle: '',
+                duration: 30
             }
         };
     },
@@ -248,9 +282,30 @@ export default {
     mounted() {
         this.loadYears();
         this.loadSlideshowState();
+        this.loadSlideshowSettings();
         setInterval(this.loadSlideshowState, 2000);
     },
+    computed: {
+        durationOutput() {
+            let duration = this.slideshow.duration;
+
+            if (duration < 60){
+                return duration + " Sekunden";
+            }else{
+                const minutes = Math.floor(duration / 60);
+                const minuteVerb = (minutes > 1) ? 'Minuten': 'Minute';
+                const seconds = (duration - minutes * 60).toLocaleString('de-DE', {minimumIntegerDigits: 2, useGrouping: false});
+                return minutes.toString() + ":" + seconds.toString() + " " + minuteVerb;
+            }
+        }
+    },
     methods: {
+        loadSlideshowSettings() {
+            axios.get('/api/slideshow/' + this.device)
+                .then(res => {
+                    this.slideshow.duration = res.data.duration;
+                });
+        },
         loadSlideshowState: function() {
             axios.get('/api/slideshow/' + this.device)
                  .then(res => {
@@ -304,17 +359,44 @@ export default {
             this.successMessage = '';
             this.errorMessage = '';
         },
-        triggerAction: function (action, queueTitle = '') {
+        triggerActionSettingDuration(duration) {
             const actionParameter = {
-                action: action,
+                action: SLIDESHOW_ACTION_UPDATE_SETTINGS_DURATION,
+                duration: duration
+            }
+            return this.sendTriggerAction(actionParameter);
+        },
+        triggerActionQueue(queueTitle) {
+            const actionParameter = {
+                action: SLIDESHOW_ACTION_START_QUEUE,
                 queue_title: queueTitle
             }
-            this.loading = true;
-            axios.put('/api/slideshow/triggerNextAction/' + this.device, actionParameter)
-                 .then(() => {
-                     this.loading = false;
-                 })
-            this.loadSlideshowState();
+            return this.sendTriggerAction(actionParameter);
+        },
+        triggerActionSimple: function (action) {
+            const actionParameter = {
+                action: action
+            }
+            this.sendTriggerAction(actionParameter);
+        },
+        sendTriggerAction(actionParameter){
+            return new Promise((resolve, reject) => {
+                this.loading = true;
+                axios.put('/api/slideshow/triggerNextAction/' + this.device, actionParameter)
+                    .then(() => {
+                        this.loading = false;
+                    })
+                    .catch(error => {
+                        this.loading = false;
+                        this.errorMessage = error;
+                        reject(error)
+                    })
+                    .finally(() => {
+                        this.loadSlideshowState();
+                        resolve();
+                    })
+                ;
+            });
         },
         startQueue(random) {
             let queueData = null, message = '', queueTitle = '', defaultTitle = '';
@@ -349,7 +431,7 @@ export default {
                 .then(() => {
                     this.errorMessage = '';
                     this.successMessage = 'Eine Warteschlange mit dem Titel "' + queueTitle + '" wurde erfolgreich erstellt.';
-                    this.triggerAction('start_queue', queueTitle);
+                    this.triggerActionQueue(queueTitle);
                 })
                 .catch(error => {
                     console.log(error)
@@ -373,11 +455,21 @@ export default {
         hideQueueModal() {
             this.$refs['queue-order-modal'].hide()
         },
+        showSettings() {
+            this.$refs['settings-modal'].show();
+        },
+        saveSettings() {
+            this.triggerActionSettingDuration(this.slideshow.duration).then(() => {
+                this.successMessage = 'Die Geschwindigkeit der Slideshow wurd auf ' + this.durationOutput + ' gesetzt';
+            });
+        }
     }
 };
 </script>
 
-<style>
+<style scoped lang="scss">
+@import "../../sass/variables";
+
     .messages {
         position: absolute;
         left: 10px;
@@ -459,5 +551,10 @@ export default {
 
     .album-selector .card-body {
         padding: 0.6em;
+    }
+
+    .input-group > .custom-range {
+        background-color: $progress-bg;
+        border: none;
     }
 </style>

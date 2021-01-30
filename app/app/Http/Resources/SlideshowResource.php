@@ -19,7 +19,9 @@ class SlideshowResource extends JsonResource
             'action' => $this->action,
             'next_action' => $this->next_action,
             'queue_title' => $this->queue_title,
-            'next_queue_title' => $this->next_queue_title
+            'next_queue_title' => $this->next_queue_title,
+            'duration' => $this->duration,
+            'next_duration' => $this->next_duration
         ];
     }
 }

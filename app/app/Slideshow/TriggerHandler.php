@@ -26,6 +26,29 @@ class TriggerHandler
         $slideshow->save();
     }
 
+    /**
+     * Triggers a new duration for the given slideshow
+     *
+     * @param Slideshow $slideshow
+     * @param int $nextDuration
+     * @throws InvalidNextActionException
+     */
+    public function triggerUpdateDuration(Slideshow $slideshow, int $nextDuration): void
+    {
+        $action = Slideshow::ACTION_UPDATE_SETTINGS_DURATION;
+
+        $slideshow['next_action'] = $action;
+        $slideshow['next_duration'] = $nextDuration;
+        $slideshow->save();
+    }
+
+    /**
+     * Triggers the given action to the given slideshow
+     *
+     * @param string $action
+     * @param Slideshow $slideshow
+     * @throws InvalidNextActionException
+     */
     public function triggerNextAction(string $action, Slideshow $slideshow): void
     {
         $this->validateAction($slideshow, $action);
@@ -43,5 +66,4 @@ class TriggerHandler
             throw new InvalidNextActionException(sprintf('Next action %1$s already triggered.', $action));
         }
     }
-
 }

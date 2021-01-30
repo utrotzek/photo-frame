@@ -21,10 +21,26 @@ class ActionHandler
             case Slideshow::ACTION_PREV:
                 $this->handleSimpleAction($slideshow);
                 break;
+            case Slideshow::ACTION_UPDATE_SETTINGS_DURATION:
+                $this->handleUpdateSettingsDuration($slideshow);
+                break;
             default:
                 $this->handleAction($slideshow);
                 break;
         }
+    }
+
+    /**
+     * Handles the settings duration update task
+     *
+     * @param Slideshow $slideshow
+     */
+    protected function handleUpdateSettingsDuration(Slideshow $slideshow)
+    {
+        $slideshow['duration'] = $slideshow['next_duration'];
+        $slideshow['next_action'] = null;
+        $slideshow['next_duration'] = null;
+        $slideshow->save();
     }
 
     /**
