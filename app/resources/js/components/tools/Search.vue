@@ -16,11 +16,13 @@
                 @keyup="triggerSearch"
             >
             </b-input>
-            <b-icon-x-circle-fill
-                v-if="displayDelete"
+            <span
                 class="search-clear"
                 @click="clearQuery"
-            ></b-icon-x-circle-fill>
+                v-if="displayDelete"
+            >
+                <b-icon-x-circle-fill></b-icon-x-circle-fill>
+            </span>
         </b-form>
     </div>
 </template>
@@ -51,25 +53,34 @@ export default {
 };
 </script>
 
-<style scoped>
+<style scoped lang="scss">
+@import "../../../sass/variables";
+
 .search-wrapper {
     position: relative;
 }
 .search-control {
     padding: 0 30px 0 30px;
+    height: 2.5rem;
 }
 .search-clear {
     position: absolute;
-    right: 10px;
-    top: 10px;
+    display: inline-block;
+    right: 0;
+    top: 0;
     color: #868e96;
+    padding-top: 0.5rem;
+    padding-left: 0.5rem;
     cursor: pointer;
     z-index: 100;
+    height: 100%;
+    width: 30px;
+    align-content: center;
 }
 .search-icon {
     position: absolute;
-    left: 10px;
-    top: 7px;
-    color: #ced4da;
+    left: 0.5rem;
+    top: 0.8rem;
+    color: $gray-500;
 }
 </style>
