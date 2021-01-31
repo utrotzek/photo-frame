@@ -16,45 +16,49 @@
             {{ errorMessage }}
         </div>
 
-        <div class="row">
-            <div class="col-3">
-                <inline-svg name="owl"></inline-svg>
-            </div>
-            <div class="col-9">
-                <p>
-                    Steuern Sie hier die Bildershow auf ihrem Fotorahmen.
-                </p>
-            </div>
-        </div>
-
-        <h3>{{ slideshow.queueTitle }}</h3>
-        <div id="player-information" class="row mb-3">
-            <!-- /.info-box -->
-            <div class="col-sm-6 col-12">
-                <div class="row">
-                    <div class="clm col-12">
-                        <b-icon-view-stacked class="ml-1 mr-1"></b-icon-view-stacked>
-                        <span class="info-text"><b>{{ queue.statistics.current_position }}</b> von <b>{{ queue.statistics.total }}</b></span></div>
-                </div>
-
-                <div class="row">
-                    <div class="clm col-12">
-                        <b-icon-image class="ml-1 mr-1"></b-icon-image>
-                        <span class="info-text">{{ queue.statistics.file_name }}</span></div>
-                </div>
-
-                <div class="row">
-                    <div class="clm col-12">
-                        <b-icon-folder2-open class="ml-1 mr-1"></b-icon-folder2-open>
-                        <span class="info-text">{{ queue.statistics.album }}</span></div>
-                </div>
-
-                <div class="row">
-                    <div class="clm col-12">
-                        <b-icon-calendar-date class="ml-1 mr-1"></b-icon-calendar-date>
-                        <span class="info-text">{{ queue.statistics.year }}</span></div>
-                </div>
-            </div>
+        <h3>Aktuell angezeigt</h3>
+        <div id="player-information">
+            <b-row>
+                <b-col cols="12" class="clm">
+                    Playlist: {{ slideshow.queueTitle }}
+                </b-col>
+            </b-row>
+            <b-row>
+                <b-col cols="12" class="clm">
+                    <b-icon-view-stacked class="ml-1 mr-1"></b-icon-view-stacked>
+                    <span class="info-text"><b>{{ queue.statistics.current_position }}</b> von <b>{{ queue.statistics.total }}</b></span>
+                </b-col>
+            </b-row>
+            <b-row>
+                <b-col cols="12" class="clm">
+                    <b-icon-image class="ml-1 mr-1"></b-icon-image>
+                    <span class="info-text">{{ queue.statistics.file_name }}</span>
+                </b-col>
+            </b-row>
+            <b-row>
+                <b-col cols="12" class="clm">
+                    <b-icon-folder2-open class="ml-1 mr-1"></b-icon-folder2-open>
+                    <span class="info-text">{{ queue.statistics.album }}</span>
+                </b-col>
+            </b-row>
+            <b-row>
+                <b-col cols="12" class="clm">
+                    <b-icon-calendar-date class="ml-1 mr-1"></b-icon-calendar-date>
+                    <span class="info-text">{{ queue.statistics.year }}</span>
+                </b-col>
+            </b-row>
+            <b-row class="mt-1">
+                <b-col cols="12">
+                    <b-button-group class="d-flex">
+                        <b-button class="mr-1" @click="deletePhoto"><b-icon-trash></b-icon-trash> Foto löschen</b-button>
+                        <b-button @click="toggleFavorite">
+                            <b-icon-heart v-if="!queue.statistics.favorite"></b-icon-heart>
+                            <b-icon-heart-fill v-else></b-icon-heart-fill>
+                            Als Favorit markieren
+                        </b-button>
+                    </b-button-group>
+                </b-col>
+            </b-row>
         </div>
 
         <h3>Andere Fotos abspielen</h3>
@@ -258,6 +262,8 @@ export default {
                     year: 0,
                     file_name: '',
                     album: '',
+                    favorite: false,
+                    index_id: 0
                 }
             },
             slideshow: {
@@ -318,7 +324,9 @@ export default {
                         current_position: res.data.current_position,
                         year: res.data.year,
                         album: res.data.album,
-                        file_name: res.data.file_name
+                        file_name: res.data.file_name,
+                        favorite: res.data.favorite,
+                        index_id: res.data.index_id
                     }
                 });
         },
@@ -460,6 +468,21 @@ export default {
             this.triggerActionSettingDuration(this.slideshow.duration).then(() => {
                 this.successMessage = 'Die Geschwindigkeit der Slideshow wurd auf ' + this.durationOutput + ' gesetzt';
             });
+        },
+        deletePhoto() {
+            console.log('delete');
+        },
+        toggleFavorite() {
+            this.loading = true;
+            axios.put('api/index/toggleFavorite/' + this.queue.statistics.index_id).then(() => {
+                this.queue.statistics.favorite = !this.queue.statistics.favorite;
+                this.loading = false;
+                if (!this.queue.statistics.favorite) {
+                    this.successMessage = 'Das Foto wurde erfogreich als Favorit markiert.';
+                }else{
+                    this.successMessage = 'Das Foto ist nun kein Favorit mehr. Es kann jederzeit wieder als Favorit markiert werden';
+                }
+            })
         }
     }
 };

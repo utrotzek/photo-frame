@@ -115,7 +115,9 @@ class QueueController extends Controller
             'current_position' => $currentQueue['id'],
             'year' => $currentIndex['year'],
             'file_name' => $currentIndex['file_name'],
-            'album' => $currentIndex['base_name']
+            'album' => $currentIndex['base_name'],
+            'favorite' => $currentIndex['favorite'],
+            'index_id' => $currentIndex['id']
         ]);
     }
 }

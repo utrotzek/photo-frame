@@ -38,6 +38,7 @@ Route::get('/index/state', [IndexController::class, 'state']);
 Route::put('/index/update', [IndexController::class, 'update']);
 Route::get('/index/statistics', [IndexController::class, 'statistics']);
 Route::get('/index/years', [IndexController::class, 'years']);
+Route::put('/index/toggleFavorite/{index}', [IndexController::class, 'toggleFavorite']);
 
 //queue
 Route::post('/queue/create', [QueueController::class, 'create']);

@@ -39,6 +39,18 @@ class IndexController extends Controller
         }
     }
 
+    public function toggleFavorite(Index $index)
+    {
+        $index['favorite'] = !$index['favorite'];
+        $index->save();
+
+        if ($index['favorite']){
+            return new Response('Successfully marked as favorite');
+        }else{
+            return new Response('Favorite successfully unmarked');
+        }
+    }
+
     public function directories(Request $request) {
         return new Response(IndexDirectoriesAggregator::getIndexedDirectories());
     }
