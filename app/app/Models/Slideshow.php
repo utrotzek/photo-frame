@@ -27,6 +27,9 @@ class Slideshow extends Model
     const ACTION_START_QUEUE = 'start_queue';
     const ACTION_RESTART = 'restart';
     const ACTION_UPDATE_SETTINGS_DURATION = 'settings_duration';
+    const SLIDESHOW_ACTION_RELOAD_CURRENT = 'reload_current';
+    const SLIDESHOW_ACTION_ADD_FAVORITE = 'add_favorite';
+    const SLIDESHOW_ACTION_REMOVE_FAVORITE = 'remove_favorite';
 
     public static function findByDevice($device): self
     {

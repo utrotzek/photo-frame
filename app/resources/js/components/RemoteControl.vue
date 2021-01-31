@@ -50,7 +50,7 @@
             <b-row class="mt-1">
                 <b-col cols="12">
                     <b-button-group class="d-flex">
-                        <b-button class="mr-1" @click="deletePhoto"><b-icon-trash></b-icon-trash> Foto löschen</b-button>
+                        <b-button class="mr-1" @click="$refs['delete-picture-modal'].show()"><b-icon-trash></b-icon-trash> Foto löschen</b-button>
                         <b-button @click="toggleFavorite">
                             <b-icon-heart v-if="!queue.statistics.favorite"></b-icon-heart>
                             <b-icon-heart-fill v-else></b-icon-heart-fill>
@@ -164,6 +164,14 @@
         </div>
 
         <!-- Modals -->
+        <b-modal id="delete-picture-modal" ref="delete-picture-modal" title="Foto wirklich löschen?" hide-footer centered>
+            <p class="my-4">Wollen Sie das Foto wirklich löschen? Dieser Vorgang kann nicht rückgängig gemacht werden.</p>
+            <b-button-group>
+                <b-button @click="$refs['delete-picture-modal'].hide()">Abbrechen</b-button>
+                <b-button @click="deletePicture" variant="danger">Löschen</b-button>
+            </b-button-group>
+        </b-modal>
+
         <b-modal id="settings-modal" ref="settings-modal" v-model="settingsVisible" centered title="Einstellungen" @ok="saveSettings">
             <b-form-group label="Geschwindigkeit">
                 <b-input-group>
@@ -225,6 +233,9 @@ const SLIDESHOW_ACTION_PLAY = 'play';
 const SLIDESHOW_ACTION_STOP = 'stop';
 const SLIDESHOW_ACTION_PREV = 'prev';
 const SLIDESHOW_ACTION_NEXT = 'next';
+const SLIDESHOW_ACTION_RELOAD_CURRENT = 'reload_current';
+const SLIDESHOW_ACTION_ADD_FAVORITE = 'add_favorite';
+const SLIDESHOW_ACTION_REMOVE_FAVORITE = 'remove_favorite';
 const SLIDESHOW_ACTION_START_QUEUE = 'start_queue';
 const SLIDESHOW_ACTION_RESTART = 'restart';
 const SLIDESHOW_ACTION_UPDATE_SETTINGS_DURATION = 'settings_duration';
@@ -469,17 +480,25 @@ export default {
                 this.successMessage = 'Die Geschwindigkeit der Slideshow wurd auf ' + this.durationOutput + ' gesetzt';
             });
         },
-        deletePhoto() {
-            console.log('delete');
+        deletePicture() {
+            this.loading = true;
+            axios.delete('api/index/' + this.queue.statistics.index_id).then(() => {
+                this.successMessage = 'Das Foto wurde erfogreich gelöscht.';
+                this.triggerActionSimple(SLIDESHOW_ACTION_RELOAD_CURRENT);
+                this.$refs['delete-picture-modal'].hide();
+                this.loading = false;
+            })
         },
         toggleFavorite() {
             this.loading = true;
             axios.put('api/index/toggleFavorite/' + this.queue.statistics.index_id).then(() => {
                 this.queue.statistics.favorite = !this.queue.statistics.favorite;
                 this.loading = false;
-                if (!this.queue.statistics.favorite) {
+                if (this.queue.statistics.favorite) {
                     this.successMessage = 'Das Foto wurde erfogreich als Favorit markiert.';
+                    this.triggerActionSimple(SLIDESHOW_ACTION_ADD_FAVORITE);
                 }else{
+                    this.triggerActionSimple(SLIDESHOW_ACTION_REMOVE_FAVORITE);
                     this.successMessage = 'Das Foto ist nun kein Favorit mehr. Es kann jederzeit wieder als Favorit markiert werden';
                 }
             })
