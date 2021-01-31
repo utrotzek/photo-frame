@@ -57,57 +57,8 @@
             </div>
         </div>
 
-        <div class="spinner-wrapper" :class="{ 'd-none': !loading }">
-            <div class="spinner"></div>
-        </div>
-
         <h3>Andere Fotos abspielen</h3>
-
-        <b-modal id="settings-modal" ref="settings-modal" v-model="settingsVisible" centered title="Einstellungen" @ok="saveSettings">
-            <b-form-group label="Geschwindigkeit">
-                <b-input-group>
-                    <b-form-input
-                        id="slideshow-duration"
-                        v-model="slideshow.duration"
-                        type="range"
-                        number
-                        min="10"
-                        max="600"
-                        step="10"
-                    ></b-form-input>
-                    <b-input-group-append is-text class="text-monospace">
-                        {{ durationOutput }}
-                    </b-input-group-append>
-                </b-input-group>
-            </b-form-group>
-        </b-modal>
-        <b-modal id="queue-order-modal" ref="queue-order-modal" centered title="Neue Playlist starten" hide-footer>
-            <p>Eine neue playlist wird gestaret. Bitte wählen Sie aus, in welcher Reihenfolge die Bilder abgespielt werden sollen.</p>
-            <div class="row">
-                <div class="col" v-if="queueMode === 'album'">
-                    <label for="album-title">Titel</label>
-                    <b-input
-                        id="album-title"
-                        v-model="queue.albumSelection.title"
-                        placeholder="Warteschlangen Titel"
-                        block
-                    ></b-input>
-                </div>
-            </div>
-            <div class="row">
-                <div class="col">
-                    <b-button variant="success" block @click="startQueue(true)">Zufällig</b-button>
-                </div>
-                <div class="col">
-                    <b-button variant="warning" block @click="startQueue(false)">Chronologisch</b-button>
-                </div>
-                <div class="col">
-                    <b-button variant="danger " block @click="abortQueue">Abbrechen</b-button>
-                </div>
-            </div>
-        </b-modal>
-
-        <div class="accordion" role="tablist">
+        <div id="image-control" class="accordion" role="tablist">
             <b-card no-body class="mb-1">
                 <b-card-header header-tag="header" class="p-1" role="tab">
                     <b-button block v-b-toggle.accordion-1 variant="outline-success">Nach Jahren</b-button>
@@ -206,6 +157,57 @@
                     <b-icon-skip-forward class="icon"></b-icon-skip-forward>
                 </button>
             </div>
+        </div>
+
+        <!-- Modals -->
+        <b-modal id="settings-modal" ref="settings-modal" v-model="settingsVisible" centered title="Einstellungen" @ok="saveSettings">
+            <b-form-group label="Geschwindigkeit">
+                <b-input-group>
+                    <b-form-input
+                        id="slideshow-duration"
+                        v-model="slideshow.duration"
+                        type="range"
+                        number
+                        min="10"
+                        max="600"
+                        step="10"
+                    ></b-form-input>
+                    <b-input-group-append is-text class="text-monospace">
+                        {{ durationOutput }}
+                    </b-input-group-append>
+                </b-input-group>
+            </b-form-group>
+        </b-modal>
+        <b-modal id="queue-order-modal" ref="queue-order-modal" centered title="Neue Playlist starten" hide-footer>
+
+            <p>Eine neue playlist wird gestaret. Bitte wählen Sie aus, in welcher Reihenfolge die Bilder abgespielt werden sollen.</p>
+            <div class="row">
+                <div class="col" v-if="queueMode === 'album'">
+                    <label for="album-title">Titel</label>
+                    <b-input
+                        id="album-title"
+                        v-model="queue.albumSelection.title"
+                        placeholder="Warteschlangen Titel"
+                        block
+                    ></b-input>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col">
+                    <b-button variant="success" block @click="startQueue(true)">Zufällig</b-button>
+                </div>
+                <div class="col">
+                    <b-button variant="warning" block @click="startQueue(false)">Chronologisch</b-button>
+                </div>
+                <div class="col">
+                    <b-button variant="danger " block @click="abortQueue">Abbrechen</b-button>
+                </div>
+            </div>
+        </b-modal>
+
+        <!-- loading spinner-->
+        <div class="spinner-wrapper" :class="{ 'd-none': !loading }">
+            <div class="spinner"></div>
         </div>
     </div>
 </template>
