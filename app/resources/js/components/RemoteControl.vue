@@ -169,44 +169,42 @@
                 </b-collapse>
             </b-card>
         </div>
-        <div id="remote-control-bar" class="footer">
-            <div class="row">
-                <div class="col">
-                    <button type="button" class="btn btn-secondary remote-button" @click="triggerActionSimple('prev')">
-                        <b-icon-skip-backward class="icon"></b-icon-skip-backward>
-                    </button>
-                </div>
-                <div class="col">
-                    <button type="button" class="btn btn-secondary remote-button" @click="triggerActionSimple('restart')">
-                        <b-icon-arrow-counterclockwise class="icon"></b-icon-arrow-counterclockwise>
-                    </button>
-                </div>
-                <div class="col">
-                    <button
-                        type="button"
-                        class="btn btn-secondary remote-button"
-                        @click="triggerActionSimple('play')"
-                        v-if="slideshow.state === 'pause'"
-                    >
-                        <b-icon-pause-circle class="icon"></b-icon-pause-circle>
-                    </button>
+        <div id="remote-control-bar" class="footer row">
+            <div class="col">
+                <button type="button" class="btn btn-secondary remote-button" @click="triggerActionSimple('prev')">
+                    <b-icon-skip-backward class="icon"></b-icon-skip-backward>
+                </button>
+            </div>
+            <div class="col">
+                <button type="button" class="btn btn-secondary remote-button" @click="triggerActionSimple('restart')">
+                    <b-icon-arrow-counterclockwise class="icon"></b-icon-arrow-counterclockwise>
+                </button>
+            </div>
+            <div class="col">
+                <button
+                    type="button"
+                    class="btn btn-secondary remote-button"
+                    @click="triggerActionSimple('play')"
+                    v-if="slideshow.state === 'pause'"
+                >
+                    <b-icon-pause-circle class="icon"></b-icon-pause-circle>
+                </button>
 
-                    <button
-                        type="button"
-                        class="btn btn-secondary remote-button"
-                        @click="triggerActionSimple('pause')"
-                        v-else
-                    >
-                        <b-icon-play-circle class="icon"></b-icon-play-circle>
-                    </button>
+                <button
+                    type="button"
+                    class="btn btn-secondary remote-button"
+                    @click="triggerActionSimple('pause')"
+                    v-else
+                >
+                    <b-icon-play-circle class="icon"></b-icon-play-circle>
+                </button>
 
 
-                </div>
-                <div class="col">
-                    <button type="button" class="btn btn-secondary remote-button" @click="triggerActionSimple('next')">
-                        <b-icon-skip-forward class="icon"></b-icon-skip-forward>
-                    </button>
-                </div>
+            </div>
+            <div class="col">
+                <button type="button" class="btn btn-secondary remote-button" @click="triggerActionSimple('next')">
+                    <b-icon-skip-forward class="icon"></b-icon-skip-forward>
+                </button>
             </div>
         </div>
     </div>
@@ -533,6 +531,7 @@ export default {
         text-align: center;
         background-color: #000;
         width: 100%;
+        z-index: 100;
         bottom: 0;
     }
 
