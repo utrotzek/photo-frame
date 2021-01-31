@@ -63,7 +63,7 @@
 
         <h3>Andere Fotos abspielen</h3>
 
-        <b-modal id="settings-modal" ref="settings-modal" centeredt title="Einstellungen" @ok="saveSettings">
+        <b-modal id="settings-modal" ref="settings-modal" centered title="Einstellungen" @ok="saveSettings">
             <b-form-group label="Geschwindigkeit">
                 <b-input-group>
                     <b-form-input
@@ -309,6 +309,7 @@ export default {
         loadSlideshowState: function() {
             axios.get('/api/slideshow/' + this.device)
                  .then(res => {
+
                      this.slideshow.state = res.data.action;
                      this.slideshow.queueTitle = res.data.queue_title;
                  });
