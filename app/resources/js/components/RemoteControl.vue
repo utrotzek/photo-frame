@@ -63,7 +63,7 @@
 
         <h3>Andere Fotos abspielen</h3>
 
-        <b-modal id="settings-modal" ref="settings-modal" centeredt title="Einstellungen" @ok="saveSettings">
+        <b-modal id="settings-modal" ref="settings-modal" v-model="settingsVisible" centered title="Einstellungen" @ok="saveSettings">
             <b-form-group label="Geschwindigkeit">
                 <b-input-group>
                     <b-form-input
@@ -238,7 +238,7 @@ export default {
             loading: false,
             pendingAction: false,
             queueMode: null,
-
+            settingsVisible: false,
             albumSelectorKey: 0,
             index: {
                 allYeas: []
@@ -282,7 +282,6 @@ export default {
     mounted() {
         this.loadYears();
         this.loadSlideshowState();
-        this.loadSlideshowSettings();
         setInterval(this.loadSlideshowState, 2000);
     },
     computed: {
@@ -300,15 +299,14 @@ export default {
         }
     },
     methods: {
-        loadSlideshowSettings() {
-            axios.get('/api/slideshow/' + this.device)
-                .then(res => {
-                    this.slideshow.duration = res.data.duration;
-                });
-        },
         loadSlideshowState: function() {
             axios.get('/api/slideshow/' + this.device)
                  .then(res => {
+
+                     if (!this.settingsVisible) {
+                        this.slideshow.duration = res.data.duration;
+                     }
+
                      this.slideshow.state = res.data.action;
                      this.slideshow.queueTitle = res.data.queue_title;
                  });
@@ -456,7 +454,7 @@ export default {
             this.$refs['queue-order-modal'].hide()
         },
         showSettings() {
-            this.$refs['settings-modal'].show();
+            this.settingsVisible = true;
         },
         saveSettings() {
             this.triggerActionSettingDuration(this.slideshow.duration).then(() => {
