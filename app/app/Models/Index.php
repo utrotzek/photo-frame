@@ -27,6 +27,11 @@ class Index extends Model
         'file_creation_date' => 'datetime',
     ];
 
+    public function queues()
+    {
+        return $this->hasMany(Queue::class);
+    }
+
     public function getFilePath(){
         return "{$this->path}/{$this->file_name}";
     }

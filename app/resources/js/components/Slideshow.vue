@@ -8,6 +8,8 @@
                 <b-icon-skip-forward class="icon" :class="{active: commandInfo.next}"></b-icon-skip-forward>
                 <b-icon-skip-backward class="icon" :class="{active: commandInfo.prev}"></b-icon-skip-backward>
                 <b-icon-clock class="icon" :class="{active: commandInfo.duration}"></b-icon-clock>
+                <b-icon-heart-fill class="icon" :class="{active: commandInfo.add_favorite}"></b-icon-heart-fill>
+                <b-icon-heart class="icon" :class="{active: commandInfo.remove_favorite}"></b-icon-heart>
             </div>
         </div>
 
@@ -42,6 +44,9 @@ const SLIDESHOW_ACTION_PREV = 'prev';
 const SLIDESHOW_ACTION_NEXT = 'next';
 const SLIDESHOW_ACTION_START_QUEUE = 'start_queue';
 const SLIDESHOW_ACTION_RESTART = 'restart';
+const SLIDESHOW_ACTION_RELOAD_CURRENT = 'reload_current';
+const SLIDESHOW_ACTION_ADD_FAVORITE = 'add_favorite';
+const SLIDESHOW_ACTION_REMOVE_FAVORITE = 'remove_favorite';
 const SLIDESHOW_ACTION_UPDATE_SETTINGS_DURATION = 'settings_duration';
 
 export default {
@@ -63,6 +68,8 @@ export default {
                 next: false,
                 play: false,
                 duration: false,
+                add_favorite: false,
+                remove_favorite: false,
             },
             settings: {
                 //slide time in seconds
@@ -218,6 +225,8 @@ export default {
             this.commandInfo.play = false;
             this.commandInfo.restart = false;
             this.commandInfo.duration = false;
+            this.commandInfo.add_favorite = false;
+            this.commandInfo.remove_favorite = false;
         },
         pollCommands: function() {
             if (!this.locks.commandsProcessing){
@@ -265,6 +274,15 @@ export default {
                 case "play":
                     this.commandInfo.play = true;
                     this.setPause(false);
+                    break;
+                case SLIDESHOW_ACTION_ADD_FAVORITE:
+                    this.commandInfo.add_favorite = true;
+                    break;
+                case SLIDESHOW_ACTION_REMOVE_FAVORITE:
+                    this.commandInfo.remove_favorite = true;
+                    break;
+                case SLIDESHOW_ACTION_RELOAD_CURRENT:
+                    this.loadCurrentImage();
                     break;
                 case SLIDESHOW_ACTION_UPDATE_SETTINGS_DURATION:
                     this.updateDuration(duration);

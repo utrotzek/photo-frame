@@ -39,6 +39,37 @@ class IndexController extends Controller
         }
     }
 
+    public function toggleFavorite(Index $index)
+    {
+        $index['favorite'] = !$index['favorite'];
+        $index->save();
+
+        if ($index['favorite']){
+            return new Response('Successfully marked as favorite');
+        }else{
+            return new Response('Favorite successfully unmarked');
+        }
+    }
+
+    /**
+     * Deletes the given file
+     *
+     * @param Index $index
+     * @return Response
+     * @throws \Exception
+     */
+    public function deleteImage(Index $index): Response
+    {
+        $filePath = $index['path'].'/'.$index['file_name'];
+        if (file_exists($filePath)) {
+            $index->delete();
+            unlink($filePath);
+            return new Response(sprintf('The file "%1$s" was successfully deleted.', $filePath));
+        }else{
+            return new Response(sprintf('The file "%1$s" could not be found.', $filePath),404);
+        }
+    }
+
     public function directories(Request $request) {
         return new Response(IndexDirectoriesAggregator::getIndexedDirectories());
     }

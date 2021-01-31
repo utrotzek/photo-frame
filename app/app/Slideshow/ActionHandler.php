@@ -19,6 +19,9 @@ class ActionHandler
             case Slideshow::ACTION_RESTART:
             case Slideshow::ACTION_NEXT:
             case Slideshow::ACTION_PREV:
+            case Slideshow::SLIDESHOW_ACTION_RELOAD_CURRENT:
+            case Slideshow::SLIDESHOW_ACTION_ADD_FAVORITE:
+            case Slideshow::SLIDESHOW_ACTION_REMOVE_FAVORITE:
                 $this->handleSimpleAction($slideshow);
                 break;
             case Slideshow::ACTION_UPDATE_SETTINGS_DURATION:

@@ -16,98 +16,53 @@
             {{ errorMessage }}
         </div>
 
-        <div class="row">
-            <div class="col-3">
-                <inline-svg name="owl"></inline-svg>
-            </div>
-            <div class="col-9">
-                <p>
-                    Steuern Sie hier die Bildershow auf ihrem Fotorahmen.
-                </p>
-            </div>
-        </div>
-
-        <h3>{{ slideshow.queueTitle }}</h3>
-        <div id="player-information" class="row mb-3">
-            <!-- /.info-box -->
-            <div class="col-sm-6 col-12">
-                <div class="row">
-                    <div class="clm col-12">
-                        <b-icon-view-stacked class="ml-1 mr-1"></b-icon-view-stacked>
-                        <span class="info-text"><b>{{ queue.statistics.current_position }}</b> von <b>{{ queue.statistics.total }}</b></span></div>
-                </div>
-
-                <div class="row">
-                    <div class="clm col-12">
-                        <b-icon-image class="ml-1 mr-1"></b-icon-image>
-                        <span class="info-text">{{ queue.statistics.file_name }}</span></div>
-                </div>
-
-                <div class="row">
-                    <div class="clm col-12">
-                        <b-icon-folder2-open class="ml-1 mr-1"></b-icon-folder2-open>
-                        <span class="info-text">{{ queue.statistics.album }}</span></div>
-                </div>
-
-                <div class="row">
-                    <div class="clm col-12">
-                        <b-icon-calendar-date class="ml-1 mr-1"></b-icon-calendar-date>
-                        <span class="info-text">{{ queue.statistics.year }}</span></div>
-                </div>
-            </div>
-        </div>
-
-        <div class="spinner-wrapper" :class="{ 'd-none': !loading }">
-            <div class="spinner"></div>
+        <h3>Aktuell angezeigt</h3>
+        <div id="player-information">
+            <b-row>
+                <b-col cols="12" class="clm">
+                    Playlist: {{ slideshow.queueTitle }}
+                </b-col>
+            </b-row>
+            <b-row>
+                <b-col cols="12" class="clm">
+                    <b-icon-view-stacked class="ml-1 mr-1"></b-icon-view-stacked>
+                    <span class="info-text"><b>{{ queue.statistics.current_position }}</b> von <b>{{ queue.statistics.total }}</b></span>
+                </b-col>
+            </b-row>
+            <b-row>
+                <b-col cols="12" class="clm">
+                    <b-icon-image class="ml-1 mr-1"></b-icon-image>
+                    <span class="info-text">{{ queue.statistics.file_name }}</span>
+                </b-col>
+            </b-row>
+            <b-row>
+                <b-col cols="12" class="clm">
+                    <b-icon-folder2-open class="ml-1 mr-1"></b-icon-folder2-open>
+                    <span class="info-text">{{ queue.statistics.album }}</span>
+                </b-col>
+            </b-row>
+            <b-row>
+                <b-col cols="12" class="clm">
+                    <b-icon-calendar-date class="ml-1 mr-1"></b-icon-calendar-date>
+                    <span class="info-text">{{ queue.statistics.year }}</span>
+                </b-col>
+            </b-row>
+            <b-row class="mt-1">
+                <b-col cols="12">
+                    <b-button-group class="d-flex">
+                        <b-button class="mr-1" @click="$refs['delete-picture-modal'].show()"><b-icon-trash></b-icon-trash> Foto löschen</b-button>
+                        <b-button @click="toggleFavorite">
+                            <b-icon-heart v-if="!queue.statistics.favorite"></b-icon-heart>
+                            <b-icon-heart-fill v-else></b-icon-heart-fill>
+                            Als Favorit markieren
+                        </b-button>
+                    </b-button-group>
+                </b-col>
+            </b-row>
         </div>
 
         <h3>Andere Fotos abspielen</h3>
-
-        <b-modal id="settings-modal" ref="settings-modal" v-model="settingsVisible" centered title="Einstellungen" @ok="saveSettings">
-            <b-form-group label="Geschwindigkeit">
-                <b-input-group>
-                    <b-form-input
-                        id="slideshow-duration"
-                        v-model="slideshow.duration"
-                        type="range"
-                        number
-                        min="10"
-                        max="600"
-                        step="10"
-                    ></b-form-input>
-                    <b-input-group-append is-text class="text-monospace">
-                        {{ durationOutput }}
-                    </b-input-group-append>
-                </b-input-group>
-            </b-form-group>
-        </b-modal>
-        <b-modal id="queue-order-modal" ref="queue-order-modal" centered title="Neue Playlist starten" hide-footer>
-            <p>Eine neue playlist wird gestaret. Bitte wählen Sie aus, in welcher Reihenfolge die Bilder abgespielt werden sollen.</p>
-            <div class="row">
-                <div class="col" v-if="queueMode === 'album'">
-                    <label for="album-title">Titel</label>
-                    <b-input
-                        id="album-title"
-                        v-model="queue.albumSelection.title"
-                        placeholder="Warteschlangen Titel"
-                        block
-                    ></b-input>
-                </div>
-            </div>
-            <div class="row">
-                <div class="col">
-                    <b-button variant="success" block @click="startQueue(true)">Zufällig</b-button>
-                </div>
-                <div class="col">
-                    <b-button variant="warning" block @click="startQueue(false)">Chronologisch</b-button>
-                </div>
-                <div class="col">
-                    <b-button variant="danger " block @click="abortQueue">Abbrechen</b-button>
-                </div>
-            </div>
-        </b-modal>
-
-        <div class="accordion" role="tablist">
+        <div id="image-control" class="accordion" role="tablist">
             <b-card no-body class="mb-1">
                 <b-card-header header-tag="header" class="p-1" role="tab">
                     <b-button block v-b-toggle.accordion-1 variant="outline-success">Nach Jahren</b-button>
@@ -169,45 +124,102 @@
                 </b-collapse>
             </b-card>
         </div>
-        <div id="remote-control-bar" class="footer">
+        <div id="remote-control-bar" class="footer row">
+            <div class="col">
+                <button type="button" class="btn btn-secondary remote-button" @click="triggerActionSimple('prev')">
+                    <b-icon-skip-backward class="icon"></b-icon-skip-backward>
+                </button>
+            </div>
+            <div class="col">
+                <button type="button" class="btn btn-secondary remote-button" @click="triggerActionSimple('restart')">
+                    <b-icon-arrow-counterclockwise class="icon"></b-icon-arrow-counterclockwise>
+                </button>
+            </div>
+            <div class="col">
+                <button
+                    type="button"
+                    class="btn btn-secondary remote-button"
+                    @click="triggerActionSimple('play')"
+                    v-if="slideshow.state === 'pause'"
+                >
+                    <b-icon-pause-circle class="icon"></b-icon-pause-circle>
+                </button>
+
+                <button
+                    type="button"
+                    class="btn btn-secondary remote-button"
+                    @click="triggerActionSimple('pause')"
+                    v-else
+                >
+                    <b-icon-play-circle class="icon"></b-icon-play-circle>
+                </button>
+
+
+            </div>
+            <div class="col">
+                <button type="button" class="btn btn-secondary remote-button" @click="triggerActionSimple('next')">
+                    <b-icon-skip-forward class="icon"></b-icon-skip-forward>
+                </button>
+            </div>
+        </div>
+
+        <!-- Modals -->
+        <b-modal id="delete-picture-modal" ref="delete-picture-modal" title="Foto wirklich löschen?" hide-footer centered>
+            <p class="my-4">Wollen Sie das Foto wirklich löschen? Dieser Vorgang kann nicht rückgängig gemacht werden.</p>
+            <b-button-group>
+                <b-button @click="$refs['delete-picture-modal'].hide()">Abbrechen</b-button>
+                <b-button @click="deletePicture" variant="danger">Löschen</b-button>
+            </b-button-group>
+        </b-modal>
+
+        <b-modal id="settings-modal" ref="settings-modal" v-model="settingsVisible" centered title="Einstellungen" @ok="saveSettings">
+            <b-form-group label="Geschwindigkeit">
+                <b-input-group>
+                    <b-form-input
+                        id="slideshow-duration"
+                        v-model="slideshow.duration"
+                        type="range"
+                        number
+                        min="10"
+                        max="600"
+                        step="10"
+                    ></b-form-input>
+                    <b-input-group-append is-text class="text-monospace">
+                        {{ durationOutput }}
+                    </b-input-group-append>
+                </b-input-group>
+            </b-form-group>
+        </b-modal>
+        <b-modal id="queue-order-modal" ref="queue-order-modal" centered title="Neue Playlist starten" hide-footer>
+
+            <p>Eine neue playlist wird gestaret. Bitte wählen Sie aus, in welcher Reihenfolge die Bilder abgespielt werden sollen.</p>
             <div class="row">
-                <div class="col">
-                    <button type="button" class="btn btn-secondary remote-button" @click="triggerActionSimple('prev')">
-                        <b-icon-skip-backward class="icon"></b-icon-skip-backward>
-                    </button>
-                </div>
-                <div class="col">
-                    <button type="button" class="btn btn-secondary remote-button" @click="triggerActionSimple('restart')">
-                        <b-icon-arrow-counterclockwise class="icon"></b-icon-arrow-counterclockwise>
-                    </button>
-                </div>
-                <div class="col">
-                    <button
-                        type="button"
-                        class="btn btn-secondary remote-button"
-                        @click="triggerActionSimple('play')"
-                        v-if="slideshow.state === 'pause'"
-                    >
-                        <b-icon-pause-circle class="icon"></b-icon-pause-circle>
-                    </button>
-
-                    <button
-                        type="button"
-                        class="btn btn-secondary remote-button"
-                        @click="triggerActionSimple('pause')"
-                        v-else
-                    >
-                        <b-icon-play-circle class="icon"></b-icon-play-circle>
-                    </button>
-
-
-                </div>
-                <div class="col">
-                    <button type="button" class="btn btn-secondary remote-button" @click="triggerActionSimple('next')">
-                        <b-icon-skip-forward class="icon"></b-icon-skip-forward>
-                    </button>
+                <div class="col" v-if="queueMode === 'album'">
+                    <label for="album-title">Titel</label>
+                    <b-input
+                        id="album-title"
+                        v-model="queue.albumSelection.title"
+                        placeholder="Warteschlangen Titel"
+                        block
+                    ></b-input>
                 </div>
             </div>
+            <div class="row">
+                <div class="col">
+                    <b-button variant="success" block @click="startQueue(true)">Zufällig</b-button>
+                </div>
+                <div class="col">
+                    <b-button variant="warning" block @click="startQueue(false)">Chronologisch</b-button>
+                </div>
+                <div class="col">
+                    <b-button variant="danger " block @click="abortQueue">Abbrechen</b-button>
+                </div>
+            </div>
+        </b-modal>
+
+        <!-- loading spinner-->
+        <div class="spinner-wrapper" :class="{ 'd-none': !loading }">
+            <div class="spinner"></div>
         </div>
     </div>
 </template>
@@ -221,6 +233,9 @@ const SLIDESHOW_ACTION_PLAY = 'play';
 const SLIDESHOW_ACTION_STOP = 'stop';
 const SLIDESHOW_ACTION_PREV = 'prev';
 const SLIDESHOW_ACTION_NEXT = 'next';
+const SLIDESHOW_ACTION_RELOAD_CURRENT = 'reload_current';
+const SLIDESHOW_ACTION_ADD_FAVORITE = 'add_favorite';
+const SLIDESHOW_ACTION_REMOVE_FAVORITE = 'remove_favorite';
 const SLIDESHOW_ACTION_START_QUEUE = 'start_queue';
 const SLIDESHOW_ACTION_RESTART = 'restart';
 const SLIDESHOW_ACTION_UPDATE_SETTINGS_DURATION = 'settings_duration';
@@ -258,6 +273,8 @@ export default {
                     year: 0,
                     file_name: '',
                     album: '',
+                    favorite: false,
+                    index_id: 0
                 }
             },
             slideshow: {
@@ -318,7 +335,9 @@ export default {
                         current_position: res.data.current_position,
                         year: res.data.year,
                         album: res.data.album,
-                        file_name: res.data.file_name
+                        file_name: res.data.file_name,
+                        favorite: res.data.favorite,
+                        index_id: res.data.index_id
                     }
                 });
         },
@@ -460,6 +479,29 @@ export default {
             this.triggerActionSettingDuration(this.slideshow.duration).then(() => {
                 this.successMessage = 'Die Geschwindigkeit der Slideshow wurd auf ' + this.durationOutput + ' gesetzt';
             });
+        },
+        deletePicture() {
+            this.loading = true;
+            axios.delete('api/index/' + this.queue.statistics.index_id).then(() => {
+                this.successMessage = 'Das Foto wurde erfogreich gelöscht.';
+                this.triggerActionSimple(SLIDESHOW_ACTION_RELOAD_CURRENT);
+                this.$refs['delete-picture-modal'].hide();
+                this.loading = false;
+            })
+        },
+        toggleFavorite() {
+            this.loading = true;
+            axios.put('api/index/toggleFavorite/' + this.queue.statistics.index_id).then(() => {
+                this.queue.statistics.favorite = !this.queue.statistics.favorite;
+                this.loading = false;
+                if (this.queue.statistics.favorite) {
+                    this.successMessage = 'Das Foto wurde erfogreich als Favorit markiert.';
+                    this.triggerActionSimple(SLIDESHOW_ACTION_ADD_FAVORITE);
+                }else{
+                    this.triggerActionSimple(SLIDESHOW_ACTION_REMOVE_FAVORITE);
+                    this.successMessage = 'Das Foto ist nun kein Favorit mehr. Es kann jederzeit wieder als Favorit markiert werden';
+                }
+            })
         }
     }
 };
@@ -533,6 +575,7 @@ export default {
         text-align: center;
         background-color: #000;
         width: 100%;
+        z-index: 100;
         bottom: 0;
     }
 

@@ -112,7 +112,8 @@ class QueueProcessor
             $data[] = [
                 'parent_id' => ($isFirst) ? null : $queueId,
                 'state' => ($isFirst) ? 'current': 'queued',
-                'index_id' => $index['id']
+                'index_id' => $index['id'],
+                'row_count' => $queueId + 1
             ];
             $queueId++;
         }
