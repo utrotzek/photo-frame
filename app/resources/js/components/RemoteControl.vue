@@ -515,16 +515,13 @@ export default {
 @import "../../sass/variables";
 
     .messages {
-        position: absolute;
-        left: 10px;
-        top: 10px;
-        visibility: hidden;
         opacity: 0;
+        display: none;
         z-index: 99;
     }
 
     .messages.slide {
-        visibility: visible;
+        display:block;
         opacity: 1;
         transition: 1s;
     }
