@@ -110,6 +110,7 @@ export default {
         this.loadCurrentImage();
         this.loadPreviousBatch();
         this.loadNextBatch();
+        this.initializeSettings();
     },
     watch: {
         message(val) {
@@ -233,6 +234,7 @@ export default {
                 this.locks.commandsProcessing = true;
                 axios.get('/api/slideshow/' + this.device)
                     .then(res => {
+                        this.initializeSettings(res.data);
                         switch (res.data.action) {
                             case 'play':
                                 this.setPause(false)
@@ -250,6 +252,11 @@ export default {
                         this.locks.commandsProcessing = false;
                     });
             }
+        },
+        initializeSettings() {
+            axios.get('/api/slideshow/' + this.device).then((res) => {
+                this.settings.imageSlideTime = res.data.duration;
+            });
         },
         //TODO: refactor this
         triggerAction (action, queueTitle, duration) {
