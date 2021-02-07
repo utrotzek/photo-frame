@@ -317,29 +317,31 @@ export default {
     },
     methods: {
         loadSlideshowState: function() {
-            axios.get('/api/slideshow/' + this.device)
-                 .then(res => {
+            if (this.loading === false){
+                axios.get('/api/slideshow/' + this.device)
+                     .then(res => {
 
-                     if (!this.settingsVisible) {
-                        this.slideshow.duration = res.data.duration;
-                     }
+                         if (!this.settingsVisible) {
+                            this.slideshow.duration = res.data.duration;
+                         }
 
-                     this.slideshow.state = res.data.action;
-                     this.slideshow.queueTitle = res.data.queue_title;
-                 });
+                         this.slideshow.state = res.data.action;
+                         this.slideshow.queueTitle = res.data.queue_title;
+                     });
 
-            axios.get('/api/queue/statistics')
-                .then(res => {
-                    this.queue.statistics = {
-                        total: res.data.total,
-                        current_position: res.data.current_position,
-                        year: res.data.year,
-                        album: res.data.album,
-                        file_name: res.data.file_name,
-                        favorite: res.data.favorite,
-                        index_id: res.data.index_id
-                    }
-                });
+                axios.get('/api/queue/statistics')
+                    .then(res => {
+                        this.queue.statistics = {
+                            total: res.data.total,
+                            current_position: res.data.current_position,
+                            year: res.data.year,
+                            album: res.data.album,
+                            file_name: res.data.file_name,
+                            favorite: res.data.favorite,
+                            index_id: res.data.index_id
+                        }
+                    });
+            }
         },
         yearSelected() {
             this.queueMode = QUEUE_MODE_YEAR;
