@@ -281,19 +281,21 @@ export default {
                 state: null,
                 queueTitle: '',
                 duration: 30
+            },
+            timeouts: {
+                successTimeout: null,
+                errorTimeout: null
             }
         };
     },
     watch: {
         successMessage(val) {
-            if (val){
-                setTimeout(this.hideAlert, 5000)
-            }
+            clearTimeout(this.timeouts.successTimeout);
+            this.timeouts.successTimeout = setTimeout(this.hideAlert, 5000)
         },
         errorMessage(val) {
-            if (val){
-                setTimeout(this.hideAlert, 5000)
-            }
+            clearTimeout(this.timeouts.errorTimeout);
+            this.timeouts.errorTimeout = setTimeout(this.hideAlert, 5000)
         }
     },
     mounted() {
