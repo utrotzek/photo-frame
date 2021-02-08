@@ -106,7 +106,7 @@ export default {
         }
     },
     created() {
-        this.setIntervals();
+        this.refreshIntervals();
     },
     mounted() {
         this.loadCurrentImage();
@@ -128,6 +128,14 @@ export default {
                 setTimeout(() => {
                         this.disableCommandInfos();
                 }, 1000);
+            }
+        },
+        settings: {
+            deep: true,
+            handler (val) {
+                //refresh intervals when settings have changed. The duration could've been changed and the timeouts
+                //need to be recalculated
+                this.refreshIntervals();
             }
         }
     },
@@ -215,7 +223,7 @@ export default {
                 this.images.splice(0, this.batchSize-1);
             }
         },
-        setIntervals () {
+        refreshIntervals () {
             clearInterval(this.interval.slideshowInterval);
             clearInterval(this.interval.pollCommandsInterval);
             clearInterval(this.interval.updateSettingsInterval);
@@ -258,9 +266,9 @@ export default {
         },
         updateSettings() {
             axios.get('/api/slideshow/' + this.device).then((res) => {
-                console.log('settings updated:')
-                console.log(res.data);
-                this.settings.imageSlideTime = res.data.duration;
+                if (this.settings.imageSlideTime !== res.data.duration) {
+                    this.settings.imageSlideTime = res.data.duration;
+                }
             });
         },
         //TODO: refactor this
@@ -300,7 +308,6 @@ export default {
                     this.updateDuration(duration);
                     break;
             }
-            this.setIntervals();
         },
         triggerSlideshow: function(){
             this.enableTransition = true;
