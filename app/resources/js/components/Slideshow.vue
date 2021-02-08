@@ -56,8 +56,6 @@ export default {
             batchSize: 4,
             reloadTimeout: 5000,
             active:  0,
-            pollCommandsInterval: null,
-            slideshowInterval: null,
             pause: false,
             enableTransition: true,
             message: '',
@@ -79,8 +77,12 @@ export default {
                 commandsProcessing: false,
                 slideshowProcessing: false
             },
+            interval: {
+                updateSettingsInterval: null,
+                pollCommandsInterval: null,
+                slideshowInterval: null,
+            },
             images: []
-
         };
     },
     computed: {
@@ -110,7 +112,7 @@ export default {
         this.loadCurrentImage();
         this.loadPreviousBatch();
         this.loadNextBatch();
-        this.initializeSettings();
+        this.updateSettings();
     },
     watch: {
         message(val) {
@@ -214,10 +216,12 @@ export default {
             }
         },
         setIntervals () {
-            clearInterval(this.slideshowInterval);
-            clearInterval(this.pollCommandsInterval);
-            this.slideshowInterval = setInterval(() => this.triggerSlideshow(), (this.settings.imageSlideTime * 1000));
-            this.pollCommandsInterval = setInterval(() => this.pollCommands(), 1000);
+            clearInterval(this.interval.slideshowInterval);
+            clearInterval(this.interval.pollCommandsInterval);
+            clearInterval(this.interval.updateSettingsInterval);
+            this.interval.slideshowInterval = setInterval(() => this.triggerSlideshow(), (this.settings.imageSlideTime * 1000));
+            this.interval.pollCommandsInterval = setInterval(() => this.pollCommands(), 1000);
+            this.interval.updateSettingsInterval = setInterval(() => this.updateSettings(), 10000);
         },
         disableCommandInfos () {
             this.commandInfo.next = false;
@@ -234,7 +238,6 @@ export default {
                 this.locks.commandsProcessing = true;
                 axios.get('/api/slideshow/' + this.device)
                     .then(res => {
-                        this.initializeSettings(res.data);
                         switch (res.data.action) {
                             case 'play':
                                 this.setPause(false)
@@ -253,8 +256,10 @@ export default {
                     });
             }
         },
-        initializeSettings() {
+        updateSettings() {
             axios.get('/api/slideshow/' + this.device).then((res) => {
+                console.log('settings updated:')
+                console.log(res.data);
                 this.settings.imageSlideTime = res.data.duration;
             });
         },
