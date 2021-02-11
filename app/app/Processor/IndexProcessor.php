@@ -56,9 +56,14 @@ class IndexProcessor
                 $finder = $this->configureFinder();
 
                 if (!$fullIndex) {
-                    //find files which have been manipulated since the last index run
-                    $finder->filter(function (SplFileInfo $file){
-                        return fileatime($file->getRealPath()) > strtotime($this->indexState['last_run']->format('d.m.Y H:i:s'));
+                    $lastCreationDate = Index::query()
+                        ->orderBy('file_creation_date', 'desc')
+                        ->pluck('file_creation_date')
+                        ->first();
+
+                    //find files which have been manipulated after the last manipulation date of a file already indexed
+                    $finder->filter(function (SplFileInfo $file) use ($lastCreationDate){
+                        return filectime ($file->getRealPath()) > strtotime($lastCreationDate->format('d.m.Y H:i:s'));
                     });
                 }
 
