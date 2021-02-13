@@ -1,10 +1,10 @@
 <template>
     <div class="playlist-selector">
         <b-row>
-            <b-col cols="10">
-                <h3>Playlist auswählen</h3>
+            <b-col cols="9">
+                <h3>Playlisten</h3>
             </b-col>
-            <b-col cols="2" class="text-right">
+            <b-col cols="3" class="text-right">
                <b-button @click="loadPlaylists"><b-icon-arrow-counterclockwise></b-icon-arrow-counterclockwise></b-button>
             </b-col>
         </b-row>

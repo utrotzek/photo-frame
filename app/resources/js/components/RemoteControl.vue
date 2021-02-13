@@ -128,18 +128,24 @@
                 </b-collapse>
             </b-card>
         </div>
-        <div id="remote-control-bar" class="footer row">
-            <div class="col">
+
+        <div class="mb-5">
+            <!-- empty spacer to let the content not stop at the very bottom of the page -->
+            &nbsp;
+        </div>
+
+        <b-row id="remote-control-bar" class="footer">
+            <b-col>
                 <button type="button" class="btn btn-secondary remote-button" @click="triggerActionSimple('prev')">
                     <b-icon-skip-backward class="icon"></b-icon-skip-backward>
                 </button>
-            </div>
-            <div class="col">
+            </b-col>
+            <b-col>
                 <button type="button" class="btn btn-secondary remote-button" @click="triggerActionSimple('restart')">
                     <b-icon-arrow-counterclockwise class="icon"></b-icon-arrow-counterclockwise>
                 </button>
-            </div>
-            <div class="col">
+            </b-col>
+            <b-col>
                 <button
                     type="button"
                     class="btn btn-secondary remote-button"
@@ -157,15 +163,13 @@
                 >
                     <b-icon-play-circle class="icon"></b-icon-play-circle>
                 </button>
-
-
-            </div>
-            <div class="col">
+            </b-col>
+            <b-col>
                 <button type="button" class="btn btn-secondary remote-button" @click="triggerActionSimple('next')">
                     <b-icon-skip-forward class="icon"></b-icon-skip-forward>
                 </button>
-            </div>
-        </div>
+            </b-col>
+        </b-row>
 
         <!-- Modals -->
         <b-modal id="delete-picture-modal" ref="delete-picture-modal" title="Foto wirklich löschen?" hide-footer centered>
