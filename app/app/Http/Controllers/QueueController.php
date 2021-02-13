@@ -6,6 +6,7 @@ use App\Http\Resources\QueueResource;
 use App\Models\Playlist;
 use App\Models\Queue;
 use App\Processor\QueueProcessor;
+use App\Utility\PathUtility;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 
@@ -120,7 +121,7 @@ class QueueController extends Controller
                 'current_position' => $currentQueue['row_count'],
                 'year' => $currentIndex['year'],
                 'file_name' => $currentIndex['file_name'],
-                'album' => $currentIndex['base_name'],
+                'album' => PathUtility::getAlbumNameFromPath($currentIndex['path']),
                 'favorite' => $currentIndex['favorite'],
                 'index_id' => $currentIndex['id']
             ]);
