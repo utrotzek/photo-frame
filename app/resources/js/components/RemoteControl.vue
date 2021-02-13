@@ -20,7 +20,8 @@
         <div id="player-information">
             <b-row>
                 <b-col cols="12" class="clm">
-                    Playlist: {{ slideshow.queueTitle }}
+                    <b-icon-card-list class="ml-1 mr-1"></b-icon-card-list>
+                    <span class="info-text"><b>{{ slideshow.queueTitle }}</b></span>
                 </b-col>
             </b-row>
             <b-row>
