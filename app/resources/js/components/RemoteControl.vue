@@ -66,7 +66,15 @@
         <div id="image-control" class="accordion" role="tablist">
             <b-card no-body class="mb-1">
                 <b-card-header header-tag="header" class="p-1" role="tab">
-                    <b-button block v-b-toggle.queue-year variant="outline-success">Nach Jahren</b-button>
+                    <b-button
+                        block
+                        v-b-toggle.queue-year
+                        variant="outline-success"
+                        ref="year-selection-button"
+                        :class="{ sticky: stickyButtons.yearSticky }"
+                    >
+                        Nach Jahren
+                    </b-button>
                 </b-card-header>
                 <b-collapse id="queue-year" accordion="my-accordion" role="tabpanel">
                     <b-card-body>
@@ -103,7 +111,15 @@
             </b-card>
             <b-card no-body class="mb-1">
                 <b-card-header header-tag="header" class="p-1" role="tab">
-                    <b-button block v-b-toggle.queue-album variant="outline-success">Album auswählen</b-button>
+                    <b-button
+                        block
+                        v-b-toggle.queue-album
+                        variant="outline-success"
+                        ref="album-selection-button"
+                        :class="{ sticky: stickyButtons.albumSticky }"
+                    >
+                        Album auswählen
+                    </b-button>
                 </b-card-header>
                 <b-collapse id="queue-album" class="album-selector" accordion="my-accordion" role="tabpanel">
                     <b-card-body>
@@ -116,7 +132,15 @@
             </b-card>
             <b-card no-body class="mb-1">
                 <b-card-header header-tag="header" class="p-1" role="tab">
-                    <b-button block v-b-toggle.queue-playlist variant="outline-success">Playliste auswählen</b-button>
+                    <b-button
+                        block
+                        v-b-toggle.queue-playlist
+                        variant="outline-success"
+                        ref="playlist-selection-button"
+                        :class="{ sticky: stickyButtons.playlistSticky }"
+                    >
+                        Playliste auswählen
+                    </b-button>
                 </b-card-header>
                 <b-collapse id="queue-playlist" accordion="my-accordion" role="tabpanel">
                     <b-card-body>
@@ -302,6 +326,11 @@ export default {
             timeouts: {
                 successTimeout: null,
                 errorTimeout: null
+            },
+            stickyButtons: {
+                albumSticky: false,
+                playlistSticky: false,
+                yearSticky: false
             }
         };
     },
@@ -319,6 +348,10 @@ export default {
         this.loadYears();
         this.loadSlideshowState();
         setInterval(this.loadSlideshowState, 2000);
+        document.getElementById('app').addEventListener('scroll', this.handleScroll);
+    },
+    destroyed () {
+        document.getElementById('app').removeEventListener('scroll', this.handleScroll);
     },
     computed: {
         durationOutput() {
@@ -566,6 +599,11 @@ export default {
             .catch((error) => {
                 this.errorMessage = "Fehler beim Speichern der playlist";
             });
+        },
+        handleScroll(event) {
+            this.stickyButtons.albumSticky = this.$refs['album-selection-button'].getBoundingClientRect().top <= 5;
+            this.stickyButtons.playlistSticky = this.$refs['playlist-selection-button'].getBoundingClientRect().top <= 5;
+            this.stickyButtons.yearSticky = this.$refs['year-selection-button'].getBoundingClientRect().top <= 5;
         }
     }
 };
@@ -658,5 +696,33 @@ export default {
     .input-group > .custom-range {
         background-color: $progress-bg;
         border: none;
+    }
+
+    #image-control header {
+        position: -webkit-sticky;
+        position: sticky;
+        top: 0;
+        z-index: 100;
+    }
+    #image-control button.not-collapsed {
+        background-color: $success;
+        color: white;
+    }
+
+    #image-control button {
+        transition: width 0.3s, margin-left 0.3s;
+    }
+
+    #image-control button.sticky.not-collapsed {
+        width: 100vw;
+        margin-left: calc(-50vw + 50%);
+        margin-top: -5px;
+    }
+</style>
+
+<style>
+    /* This is necessary to make the "sticky-header" work */
+    .accordion > .card {
+        overflow: visible;
     }
 </style>
