@@ -279,6 +279,9 @@ export default {
                     this.commandInfo.next = true;
                     this.next();
                     break;
+                case SLIDESHOW_ACTION_START_QUEUE:
+                    this.startQueue(queueTitle);
+                    break;
                 case "restart":
                     this.commandInfo.restart = true;
                     this.restart();

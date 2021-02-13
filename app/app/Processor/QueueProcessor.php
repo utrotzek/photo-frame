@@ -5,6 +5,8 @@ namespace App\Processor;
 
 use App\Exceptions\QueueGenerationException;
 use App\Models\Index;
+use App\Models\Playlist;
+use App\Models\PlaylistItem;
 use App\Models\Queue;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
@@ -28,9 +30,21 @@ class QueueProcessor
     {
         $queryBuilder = Index::query();
 
-        foreach ($albumList as $album){
+        foreach ($albumList as $album) {
             $internalPath = str_replace('/images', config('slideshow.imagePath'), $album);
-            $queryBuilder = $queryBuilder->orWhere('path', 'LIKE', '\\'.$internalPath.'%');
+            $queryBuilder = $queryBuilder->orWhere('path', 'LIKE', '\\' . $internalPath . '%');
+        }
+        $this->createQueueByQueryBuilder($queryBuilder, $shuffle);
+    }
+
+    public function generateQueueByPlaylist(Playlist $playlist, bool $shuffle): void
+    {
+        $queryBuilder = Index::query();
+
+        /** @var PlaylistItem $playlistItems */
+        foreach ($playlist->items()->get() as $playlistItems) {
+            $path = $playlistItems['path'];
+            $queryBuilder = $queryBuilder->orWhere('path', 'LIKE', $path.'%');
         }
         $this->createQueueByQueryBuilder($queryBuilder, $shuffle);
     }

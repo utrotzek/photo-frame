@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Resources\QueueResource;
+use App\Models\Playlist;
 use App\Models\Queue;
 use App\Processor\QueueProcessor;
 use Illuminate\Http\Request;
@@ -83,7 +84,13 @@ class QueueController extends Controller
                 );
                 break;
             case 'playlist':
-                throw new \Exception("Not implemented");
+                $playlistId = $request->input('playlistId');
+                $playlist = Playlist::find($playlistId);
+                $this->queueProcessor->generateQueueByPlaylist(
+                    $playlist,
+                    $request->input('shuffle') ?? true
+                );
+                break;
             case 'albums':
                 $this->queueProcessor->generateQueueByAlbumList(
                     $request->input('albumList'),

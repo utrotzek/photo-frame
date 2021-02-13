@@ -61,9 +61,5 @@ class TriggerHandler
         if ($slideshow['action'] === $action) {
             throw new InvalidNextActionException(sprintf('The action is already %1$s. Triggering an action would have no effect.', $action));
         }
-
-        if ($slideshow['next_action'] === $action) {
-            throw new InvalidNextActionException(sprintf('Next action %1$s already triggered.', $action));
-        }
     }
 }

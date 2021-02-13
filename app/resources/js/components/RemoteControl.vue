@@ -65,9 +65,9 @@
         <div id="image-control" class="accordion" role="tablist">
             <b-card no-body class="mb-1">
                 <b-card-header header-tag="header" class="p-1" role="tab">
-                    <b-button block v-b-toggle.accordion-1 variant="outline-success">Nach Jahren</b-button>
+                    <b-button block v-b-toggle.queue-year variant="outline-success">Nach Jahren</b-button>
                 </b-card-header>
-                <b-collapse id="accordion-1" accordion="my-accordion" role="tabpanel">
+                <b-collapse id="queue-year" accordion="my-accordion" role="tabpanel">
                     <b-card-body>
                         <b-card-text><h3>Zeitraum auswählen</h3></b-card-text>
                         <div class="row">
@@ -102,24 +102,28 @@
             </b-card>
             <b-card no-body class="mb-1">
                 <b-card-header header-tag="header" class="p-1" role="tab">
-                    <b-button block v-b-toggle.accordion-3 variant="outline-success">Album auswählen</b-button>
+                    <b-button block v-b-toggle.queue-album variant="outline-success">Album auswählen</b-button>
                 </b-card-header>
-                <b-collapse id="accordion-3" class="album-selector" accordion="my-accordion" role="tabpanel">
+                <b-collapse id="queue-album" class="album-selector" accordion="my-accordion" role="tabpanel">
                     <b-card-body>
                         <b-card-text><h3>Album auswählen</h3></b-card-text>
                         <b-card-body>
-                            <AlbumSelector :key="albumSelectorKey" @selected="albumsSelected"></AlbumSelector>
+                            <AlbumSelector :key="albumSelectorKey" @selected="albumsSelected" @playlist-saved="playlistSaved"></AlbumSelector>
                         </b-card-body>
                     </b-card-body>
                 </b-collapse>
             </b-card>
             <b-card no-body class="mb-1">
                 <b-card-header header-tag="header" class="p-1" role="tab">
-                    <b-button block v-b-toggle.accordion-2 variant="outline-success">Playliste auswählen</b-button>
+                    <b-button block v-b-toggle.queue-playlist variant="outline-success">Playliste auswählen</b-button>
                 </b-card-header>
-                <b-collapse id="accordion-2" accordion="my-accordion" role="tabpanel">
+                <b-collapse id="queue-playlist" accordion="my-accordion" role="tabpanel">
                     <b-card-body>
-                        <b-card-text><h3>Playlist auswählen</h3></b-card-text>
+                        <PlaylistSelector
+                            ref="playlistComponent"
+                            @start-playlist="playlistSelected"
+                            @saved="playlistEdited">
+                        </PlaylistSelector>
                     </b-card-body>
                 </b-collapse>
             </b-card>
@@ -166,10 +170,14 @@
         <!-- Modals -->
         <b-modal id="delete-picture-modal" ref="delete-picture-modal" title="Foto wirklich löschen?" hide-footer centered>
             <p class="my-4">Wollen Sie das Foto wirklich löschen? Dieser Vorgang kann nicht rückgängig gemacht werden.</p>
-            <b-button-group>
-                <b-button @click="$refs['delete-picture-modal'].hide()">Abbrechen</b-button>
-                <b-button @click="deletePicture" variant="danger">Löschen</b-button>
-            </b-button-group>
+            <b-row>
+                <b-col class="text-right">
+                    <b-button-group>
+                        <b-button @click="deletePicture" variant="danger">Löschen</b-button>
+                        <b-button @click="$refs['delete-picture-modal'].hide()">Abbrechen</b-button>
+                    </b-button-group>
+                </b-col>
+            </b-row>
         </b-modal>
 
         <b-modal id="settings-modal" ref="settings-modal" v-model="settingsVisible" centered title="Einstellungen" @ok="saveSettings">
@@ -190,6 +198,7 @@
                 </b-input-group>
             </b-form-group>
         </b-modal>
+
         <b-modal id="queue-order-modal" ref="queue-order-modal" centered title="Neue Playlist starten" hide-footer>
 
             <p>Eine neue playlist wird gestaret. Bitte wählen Sie aus, in welcher Reihenfolge die Bilder abgespielt werden sollen.</p>
@@ -228,6 +237,7 @@
 import InlineSvg from "./InlineSvg";
 import moment from "moment";
 import AlbumSelector from "./tools/AlbumSelector";
+import PlaylistSelector from "./tools/PlaylistSelector";
 
 const SLIDESHOW_ACTION_PLAY = 'play';
 const SLIDESHOW_ACTION_STOP = 'stop';
@@ -242,9 +252,10 @@ const SLIDESHOW_ACTION_UPDATE_SETTINGS_DURATION = 'settings_duration';
 
 const QUEUE_MODE_YEAR = 'year';
 const QUEUE_MODE_ALBUM = 'album';
+const QUEUE_MODE_PLAYLIST = 'playlist';
 
 export default {
-    components: {InlineSvg, AlbumSelector},
+    components: {InlineSvg, AlbumSelector, PlaylistSelector},
     data () {
         return {
             device: 'main',
@@ -267,6 +278,7 @@ export default {
                     albumList: [],
                     title: ''
                 },
+                playlistSelection: null,
                 statistics: {
                     total: 0,
                     current_position: 0,
@@ -301,7 +313,7 @@ export default {
     mounted() {
         this.loadYears();
         this.loadSlideshowState();
-        setInterval(this.loadSlideshowState, 2000);
+        // setInterval(this.loadSlideshowState, 2000);
     },
     computed: {
         durationOutput() {
@@ -360,6 +372,11 @@ export default {
                 this.queue.albumSelection.title = '';
             }
 
+            this.showQueueModal();
+        },
+        playlistSelected(playlistItem){
+            this.queueMode = QUEUE_MODE_PLAYLIST;
+            this.queue.playlistSelection = playlistItem;
             this.showQueueModal();
         },
         loadYears() {
@@ -444,6 +461,15 @@ export default {
                         shuffle: random,
                         title: queueTitle
                     };
+                    break
+                case QUEUE_MODE_PLAYLIST:
+                    queueTitle = 'Playlist ' + this.queue.playlistSelection.name;
+                    queueData = {
+                        type: 'playlist',
+                        playlistId: this.queue.playlistSelection.id,
+                        shuffle: random,
+                        title: queueTitle
+                    };
                     break;
             }
             this.loading = true;
@@ -506,6 +532,35 @@ export default {
                     this.successMessage = 'Das Foto ist nun kein Favorit mehr. Es kann jederzeit wieder als Favorit markiert werden';
                 }
             })
+        },
+        playlistSaved(playlistTitle, albums) {
+            const playlistData = {
+                name: playlistTitle,
+                paths: albums
+            };
+
+            axios.post('/api/playlists', playlistData)
+            .then(res => {
+                this.successMessage = "Playlist '" + playlistTitle + "' wurde erfolgreich angelegt";
+                this.$refs.playlistComponent.loadPlaylists();
+            })
+            .catch((error) => {
+                this.errorMessage = "Fehler beim Speichern der playlist";
+            });
+        },
+        playlistEdited(playlist) {
+            const playlistData = {
+                name: playlist.name,
+                paths: playlist.items
+            };
+
+            axios.put('/api/playlists/' + playlist.id, playlistData).then((res) => {
+                this.successMessage = "Playlist '" + playlist.name + "' wurde gespeichert.";
+                this.$refs.playlistComponent.loadPlaylists();
+            })
+            .catch((error) => {
+                this.errorMessage = "Fehler beim Speichern der playlist";
+            });
         }
     }
 };

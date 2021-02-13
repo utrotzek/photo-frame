@@ -20,21 +20,75 @@
         </b-row>
         <b-row>
             <b-col>
-                <b-button-group class="d-flex">
-                    <b-button block variant="primary" class="mt-2" @click="select">Los</b-button>
-                    <b-button block variant="secondary" class="mt-2" @click="loadAlbumData">Auswahl löschen</b-button>
+                <b-button-group class="d-flex album-button-group">
+                    <b-button block variant="primary" class="mt-2 mx-1" @click="select">
+                        <b-icon-hand-thumbs-up></b-icon-hand-thumbs-up>
+                        <span class="d-none d-md-inline">Los</span>
+                    </b-button>
+                    <b-button block variant="primary" class="mt-2 mx-1" @click="$refs['save-as-playlist-modal'].show()" v-if="playlistSaveEnabled">
+                        <b-icon-plus-circle-fill></b-icon-plus-circle-fill>
+                        <span class="d-none d-md-inline">Als Playliste</span>
+                    </b-button>
+                    <b-button block variant="danger" class="mt-2 mx-1" @click="loadAlbumData">
+                        <b-icon-trash2></b-icon-trash2>
+                        <span class="d-none d-md-inline">Abbrechen</span>
+                    </b-button>
                 </b-button-group>
             </b-col>
         </b-row>
+
+        <b-modal id="save-as-playlist-modal" ref="save-as-playlist-modal" title="Auswahl als Playlist speichern" hide-footer centered>
+            <p >Sie können die aktuelle Auswahl als Playlist speichern. Geben Sie dazu einfach den gewünschten Namen der Playlist ein:</p>
+            <b-row>
+                <b-col>
+                    <b-form-group
+                        id="playlist-title-label"
+                        label="Playlist Titel"
+                        label-for="playlist-title"
+                        description="Unter diesem Titel wird die playlist auffindbar sein"
+                    >
+                        <b-form-input
+                            id="playlist-title"
+                            v-model="playlistTitle"
+                            type="text"
+                            required
+                            block
+                        ></b-form-input>
+                    </b-form-group>
+                </b-col>
+            </b-row>
+            <b-row>
+                <b-col class="text-right">
+                    <b-button-group class="mt-3">
+                        <b-button
+                            @click="savePlaylist"
+                            variant="primary"
+                            class="mr-1"
+                        >
+                            Speichern
+                        </b-button>
+                        <b-button @click="$refs['save-as-playlist-modal'].hide()">Abbrechen</b-button>
+                    </b-button-group>
+                </b-col>
+            </b-row>
+        </b-modal>
     </div>
 </template>
 
 <script>
 import DirectoryTree from "./DirectoryTree";
 import Search from "./Search";
+
 export default {
     name: 'album-selector',
     components: {DirectoryTree, Search},
+    props: {
+        playlistSaveEnabled: {
+            type: Boolean,
+            default: true
+        },
+        selectedPaths: Array
+    },
     data () {
         return {
             albums: {
@@ -57,16 +111,26 @@ export default {
                         selected: false,
                     }
                 ]
-            }
+            },
+            playlistTitle: ''
         }
     },
     mounted() {
-       this.loadAlbumData();
+        this.loadAlbumData().then(() => {
+            if (Array.isArray(this.selectedPaths)){
+                this.selectNodesByPathList(this.selectedPaths);
+            }
+        });
     },
     methods: {
         loadAlbumData() {
-            axios.get('/api/index/directories').then((res) => {
-                this.albums = res.data;
+            return new Promise((resolve, reject) => {
+                axios.get('/api/index/directories').then((res) => {
+                    this.albums = res.data;
+                    resolve(this.albums);
+                }).catch((error) => {
+                    reject(error);
+                });
             });
         },
         nodeSelected(path, selected) {
@@ -142,11 +206,23 @@ export default {
                 item.visible = found;
             });
             return anyFound;
+        },
+        selectNodesByPathList(pathList) {
+            pathList.forEach((item) => {
+                this.updateNodesRecursively(this.albums.nodes, item.path, true);
+            })
+        },
+        savePlaylist(){
+            const pathList = this.recursiveSelectPathList(this.albums.nodes);
+
+            this.$emit('playlist-saved', this.playlistTitle, pathList);
+            this.$refs['save-as-playlist-modal'].hide();
+            this.playlistTitle = "";
+            this.loadAlbumData();
         }
     }
 }
 </script>
 
 <style scoped>
-
 </style>

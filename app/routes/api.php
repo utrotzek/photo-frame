@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\CommandController;
 use App\Http\Controllers\IndexController;
+use App\Http\Controllers\PlaylistController;
 use App\Http\Controllers\QueueController;
 use App\Http\Controllers\SlideshowController;
 use Illuminate\Http\Request;
@@ -48,3 +49,6 @@ Route::get('/queue/statistics', [QueueController::class, 'statistics']);
 Route::get('/queue/nextBatch', [QueueController::class, 'nextBatch']);
 Route::get('/queue/previousBatch', [QueueController::class, 'previousBatch']);
 Route::put('/queue/move', [QueueController::class, 'move']);
+
+//playlist
+Route::resource('playlists', PlaylistController::class);
