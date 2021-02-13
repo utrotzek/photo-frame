@@ -313,7 +313,7 @@ export default {
     mounted() {
         this.loadYears();
         this.loadSlideshowState();
-        // setInterval(this.loadSlideshowState, 2000);
+        setInterval(this.loadSlideshowState, 2000);
     },
     computed: {
         durationOutput() {
