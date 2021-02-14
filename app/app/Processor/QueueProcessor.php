@@ -49,6 +49,12 @@ class QueueProcessor
         $this->createQueueByQueryBuilder($queryBuilder, $shuffle);
     }
 
+    public function generateQueueByFavorites(bool $shuffle): void
+    {
+        $queryBuilder = Index::where('favorite', true);
+        $this->createQueueByQueryBuilder($queryBuilder, $shuffle);
+    }
+
     public function restart()
     {
         Queue::query()->update(['state' => Queue::STATE_QUEUED]);

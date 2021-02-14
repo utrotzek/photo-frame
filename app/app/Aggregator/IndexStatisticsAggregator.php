@@ -17,4 +17,9 @@ class IndexStatisticsAggregator
             'oldestFileDate' => Index::getFileDate(false)
         ];
     }
+
+    public static function favoritesCount(): int
+    {
+        return Index::where('favorite', true)->count();
+    }
 }

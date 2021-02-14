@@ -98,6 +98,11 @@ class QueueController extends Controller
                     $request->input('shuffle') ?? true
                 );
                 break;
+            case 'favorites':
+                $this->queueProcessor->generateQueueByFavorites(
+                    $request->input('shuffle') ?? true
+                );
+                break;
             default:
                 return new Response(
                     sprintf(

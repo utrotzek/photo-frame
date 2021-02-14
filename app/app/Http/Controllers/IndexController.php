@@ -83,4 +83,9 @@ class IndexController extends Controller
     {
         return new Response(Index::getAllYears());
     }
+
+    public function favorites(): Response
+    {
+        return new Response( IndexStatisticsAggregator::favoritesCount());
+    }
 }

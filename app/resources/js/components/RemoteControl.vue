@@ -152,6 +152,24 @@
                     </b-card-body>
                 </b-collapse>
             </b-card>
+            <b-card no-body class="mb-1">
+                <b-card-header header-tag="header" class="p-1" role="tab">
+                    <b-button
+                        block
+                        v-b-toggle.queue-favorites
+                        variant="outline-success"
+                        ref="favorites-selection-button"
+                        :class="{ sticky: stickyButtons.favoritesSticky }"
+                    >
+                        Favoriten abspielen
+                    </b-button>
+                </b-card-header>
+                <b-collapse id="queue-favorites" accordion="my-accordion" role="tabpanel">
+                    <b-card-body>
+                        <FavoritesSelector @start-favorites="favoritesSelected"></FavoritesSelector>
+                    </b-card-body>
+                </b-collapse>
+            </b-card>
         </div>
 
         <div class="mb-5">
@@ -267,6 +285,7 @@ import InlineSvg from "./InlineSvg";
 import moment from "moment";
 import AlbumSelector from "./tools/AlbumSelector";
 import PlaylistSelector from "./tools/PlaylistSelector";
+import FavoritesSelector from "./tools/FavoritesSelector";
 
 const SLIDESHOW_ACTION_PLAY = 'play';
 const SLIDESHOW_ACTION_STOP = 'stop';
@@ -282,9 +301,10 @@ const SLIDESHOW_ACTION_UPDATE_SETTINGS_DURATION = 'settings_duration';
 const QUEUE_MODE_YEAR = 'year';
 const QUEUE_MODE_ALBUM = 'album';
 const QUEUE_MODE_PLAYLIST = 'playlist';
+const QUEUE_MODE_FAVORITES = 'favorites';
 
 export default {
-    components: {InlineSvg, AlbumSelector, PlaylistSelector},
+    components: {InlineSvg, AlbumSelector, PlaylistSelector, FavoritesSelector},
     data () {
         return {
             device: 'main',
@@ -330,7 +350,8 @@ export default {
             stickyButtons: {
                 albumSticky: false,
                 playlistSticky: false,
-                yearSticky: false
+                yearSticky: false,
+                favoritesSticky: false
             }
         };
     },
@@ -415,6 +436,10 @@ export default {
         playlistSelected(playlistItem){
             this.queueMode = QUEUE_MODE_PLAYLIST;
             this.queue.playlistSelection = playlistItem;
+            this.showQueueModal();
+        },
+        favoritesSelected(){
+            this.queueMode = QUEUE_MODE_FAVORITES;
             this.showQueueModal();
         },
         loadYears() {
@@ -505,6 +530,14 @@ export default {
                     queueData = {
                         type: 'playlist',
                         playlistId: this.queue.playlistSelection.id,
+                        shuffle: random,
+                        title: queueTitle
+                    };
+                    break;
+                case QUEUE_MODE_FAVORITES:
+                    queueTitle = 'Favoriten';
+                    queueData = {
+                        type: QUEUE_MODE_FAVORITES,
                         shuffle: random,
                         title: queueTitle
                     };
@@ -604,6 +637,7 @@ export default {
             this.stickyButtons.albumSticky = this.$refs['album-selection-button'].getBoundingClientRect().top <= 5;
             this.stickyButtons.playlistSticky = this.$refs['playlist-selection-button'].getBoundingClientRect().top <= 5;
             this.stickyButtons.yearSticky = this.$refs['year-selection-button'].getBoundingClientRect().top <= 5;
+            this.stickyButtons.favoritesSticky = this.$refs['favorites-selection-button'].getBoundingClientRect().top <= 5;
         }
     }
 };
