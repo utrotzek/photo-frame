@@ -1,0 +1,39 @@
+//// Fonts
+@import url('https://fonts.googleapis.com/css?family=Nunito');
+
+// Variables
+@import 'variables';
+
+//custom
+@import 'spinner';
+
+
+body, html {
+    overflow: hidden;
+    height: 100%;
+}
+
+#app {
+    overflow-x: hidden;
+    overflow-y: auto;
+    height: 100%;
+    padding-bottom: 50px;
+    border: solid thin black;
+}
+
+
+// Then import Bootstrap an BootstrapVue SCSS files (order is important)
+@import '../../node_modules/bootstrap/scss/bootstrap.scss';
+@import '../../node_modules/bootstrap-vue/src/index.scss';
+
+h1 {
+    font-size: 2.8em;
+}
+
+h2 {
+    font-size: 2em;
+}
+
+h3 {
+    font-size: 1.8em;
+}
