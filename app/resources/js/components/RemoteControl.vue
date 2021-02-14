@@ -261,14 +261,16 @@
                 </div>
             </div>
             <div class="row">
-                <div class="col">
-                    <b-button variant="success" block @click="startQueue(true)">Zufällig</b-button>
-                </div>
-                <div class="col">
-                    <b-button variant="warning" block @click="startQueue(false)">Chronologisch</b-button>
-                </div>
-                <div class="col">
-                    <b-button variant="danger " block @click="abortQueue">Abbrechen</b-button>
+                <div class="col text-center">
+                    <b-button variant="success" class="order-button d-inline-block mr-4" block @click="startQueue(true)">
+                        <b-icon-shuffle></b-icon-shuffle>
+                    </b-button>
+                    <b-button variant="warning" class="order-button d-inline-block mr-4" block @click="startQueue(false)">
+                        <b-icon-three-dots-vertical></b-icon-three-dots-vertical>
+                    </b-button>
+                    <b-button variant="danger" class="order-button d-inline-block" block @click="abortQueue">
+                        <b-icon-x-circle></b-icon-x-circle>
+                    </b-button>
                 </div>
             </div>
         </b-modal>
@@ -751,6 +753,12 @@ export default {
         width: 100vw;
         margin-left: calc(-50vw + 50%);
         margin-top: -5px;
+    }
+
+    .order-button {
+        height: 5em;
+        width: 5em;
+        border-radius: 50%;
     }
 </style>
 
