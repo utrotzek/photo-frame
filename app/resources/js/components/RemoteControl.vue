@@ -505,7 +505,7 @@ export default {
                 case QUEUE_MODE_YEAR:
                     queueTitle = 'Fotos von ' + this.queue.yearSelection.from + ' bis ' + this.queue.yearSelection.to;
                     queueData = {
-                        type: 'year',
+                        type: QUEUE_MODE_YEAR,
                         fromYear: this.queue.yearSelection.from,
                         toYear: this.queue.yearSelection.to,
                         shuffle: random
@@ -519,7 +519,7 @@ export default {
                     }
                     queueTitle = (this.queue.albumSelection.title === '' ? defaultTitle: this.queue.albumSelection.title);
                     queueData = {
-                        type: 'albums',
+                        type: QUEUE_MODE_ALBUM,
                         albumList: this.queue.albumSelection.albumList,
                         shuffle: random,
                         title: queueTitle
@@ -528,7 +528,7 @@ export default {
                 case QUEUE_MODE_PLAYLIST:
                     queueTitle = 'Playlist ' + this.queue.playlistSelection.name;
                     queueData = {
-                        type: 'playlist',
+                        type: QUEUE_MODE_PLAYLIST,
                         playlistId: this.queue.playlistSelection.id,
                         shuffle: random,
                         title: queueTitle
