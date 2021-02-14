@@ -92,9 +92,14 @@ class QueueController extends Controller
                     $request->input('shuffle') ?? true
                 );
                 break;
-            case 'albums':
+            case 'album':
                 $this->queueProcessor->generateQueueByAlbumList(
                     $request->input('albumList'),
+                    $request->input('shuffle') ?? true
+                );
+                break;
+            case 'favorites':
+                $this->queueProcessor->generateQueueByFavorites(
                     $request->input('shuffle') ?? true
                 );
                 break;

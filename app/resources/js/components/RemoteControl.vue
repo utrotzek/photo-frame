@@ -20,7 +20,8 @@
         <div id="player-information">
             <b-row>
                 <b-col cols="12" class="clm">
-                    Playlist: {{ slideshow.queueTitle }}
+                    <b-icon-card-list class="ml-1 mr-1"></b-icon-card-list>
+                    <span class="info-text"><b>{{ slideshow.queueTitle }}</b></span>
                 </b-col>
             </b-row>
             <b-row>
@@ -65,7 +66,15 @@
         <div id="image-control" class="accordion" role="tablist">
             <b-card no-body class="mb-1">
                 <b-card-header header-tag="header" class="p-1" role="tab">
-                    <b-button block v-b-toggle.queue-year variant="outline-success">Nach Jahren</b-button>
+                    <b-button
+                        block
+                        v-b-toggle.queue-year
+                        variant="outline-success"
+                        ref="year-selection-button"
+                        :class="{ sticky: stickyButtons.yearSticky }"
+                    >
+                        Nach Jahren
+                    </b-button>
                 </b-card-header>
                 <b-collapse id="queue-year" accordion="my-accordion" role="tabpanel">
                     <b-card-body>
@@ -102,7 +111,15 @@
             </b-card>
             <b-card no-body class="mb-1">
                 <b-card-header header-tag="header" class="p-1" role="tab">
-                    <b-button block v-b-toggle.queue-album variant="outline-success">Album auswählen</b-button>
+                    <b-button
+                        block
+                        v-b-toggle.queue-album
+                        variant="outline-success"
+                        ref="album-selection-button"
+                        :class="{ sticky: stickyButtons.albumSticky }"
+                    >
+                        Album auswählen
+                    </b-button>
                 </b-card-header>
                 <b-collapse id="queue-album" class="album-selector" accordion="my-accordion" role="tabpanel">
                     <b-card-body>
@@ -115,7 +132,15 @@
             </b-card>
             <b-card no-body class="mb-1">
                 <b-card-header header-tag="header" class="p-1" role="tab">
-                    <b-button block v-b-toggle.queue-playlist variant="outline-success">Playliste auswählen</b-button>
+                    <b-button
+                        block
+                        v-b-toggle.queue-playlist
+                        variant="outline-success"
+                        ref="playlist-selection-button"
+                        :class="{ sticky: stickyButtons.playlistSticky }"
+                    >
+                        Playliste auswählen
+                    </b-button>
                 </b-card-header>
                 <b-collapse id="queue-playlist" accordion="my-accordion" role="tabpanel">
                     <b-card-body>
@@ -124,6 +149,24 @@
                             @start-playlist="playlistSelected"
                             @saved="playlistEdited">
                         </PlaylistSelector>
+                    </b-card-body>
+                </b-collapse>
+            </b-card>
+            <b-card no-body class="mb-1">
+                <b-card-header header-tag="header" class="p-1" role="tab">
+                    <b-button
+                        block
+                        v-b-toggle.queue-favorites
+                        variant="outline-success"
+                        ref="favorites-selection-button"
+                        :class="{ sticky: stickyButtons.favoritesSticky }"
+                    >
+                        Favoriten abspielen
+                    </b-button>
+                </b-card-header>
+                <b-collapse id="queue-favorites" accordion="my-accordion" role="tabpanel">
+                    <b-card-body>
+                        <FavoritesSelector @start-favorites="favoritesSelected"></FavoritesSelector>
                     </b-card-body>
                 </b-collapse>
             </b-card>
@@ -218,14 +261,16 @@
                 </div>
             </div>
             <div class="row">
-                <div class="col">
-                    <b-button variant="success" block @click="startQueue(true)">Zufällig</b-button>
-                </div>
-                <div class="col">
-                    <b-button variant="warning" block @click="startQueue(false)">Chronologisch</b-button>
-                </div>
-                <div class="col">
-                    <b-button variant="danger " block @click="abortQueue">Abbrechen</b-button>
+                <div class="col text-center">
+                    <b-button variant="success" class="order-button d-inline-block mr-4" block @click="startQueue(true)">
+                        <b-icon-shuffle></b-icon-shuffle>
+                    </b-button>
+                    <b-button variant="warning" class="order-button d-inline-block mr-4" block @click="startQueue(false)">
+                        <b-icon-three-dots-vertical></b-icon-three-dots-vertical>
+                    </b-button>
+                    <b-button variant="danger" class="order-button d-inline-block" block @click="abortQueue">
+                        <b-icon-x-circle></b-icon-x-circle>
+                    </b-button>
                 </div>
             </div>
         </b-modal>
@@ -242,6 +287,7 @@ import InlineSvg from "./InlineSvg";
 import moment from "moment";
 import AlbumSelector from "./tools/AlbumSelector";
 import PlaylistSelector from "./tools/PlaylistSelector";
+import FavoritesSelector from "./tools/FavoritesSelector";
 
 const SLIDESHOW_ACTION_PLAY = 'play';
 const SLIDESHOW_ACTION_STOP = 'stop';
@@ -257,9 +303,10 @@ const SLIDESHOW_ACTION_UPDATE_SETTINGS_DURATION = 'settings_duration';
 const QUEUE_MODE_YEAR = 'year';
 const QUEUE_MODE_ALBUM = 'album';
 const QUEUE_MODE_PLAYLIST = 'playlist';
+const QUEUE_MODE_FAVORITES = 'favorites';
 
 export default {
-    components: {InlineSvg, AlbumSelector, PlaylistSelector},
+    components: {InlineSvg, AlbumSelector, PlaylistSelector, FavoritesSelector},
     data () {
         return {
             device: 'main',
@@ -301,6 +348,12 @@ export default {
             timeouts: {
                 successTimeout: null,
                 errorTimeout: null
+            },
+            stickyButtons: {
+                albumSticky: false,
+                playlistSticky: false,
+                yearSticky: false,
+                favoritesSticky: false
             }
         };
     },
@@ -318,6 +371,10 @@ export default {
         this.loadYears();
         this.loadSlideshowState();
         setInterval(this.loadSlideshowState, 2000);
+        document.getElementById('app').addEventListener('scroll', this.handleScroll);
+    },
+    destroyed () {
+        document.getElementById('app').removeEventListener('scroll', this.handleScroll);
     },
     computed: {
         durationOutput() {
@@ -383,6 +440,10 @@ export default {
             this.queue.playlistSelection = playlistItem;
             this.showQueueModal();
         },
+        favoritesSelected(){
+            this.queueMode = QUEUE_MODE_FAVORITES;
+            this.showQueueModal();
+        },
         loadYears() {
             axios.get('/api/index/years')
                  .then(res => {
@@ -446,7 +507,7 @@ export default {
                 case QUEUE_MODE_YEAR:
                     queueTitle = 'Fotos von ' + this.queue.yearSelection.from + ' bis ' + this.queue.yearSelection.to;
                     queueData = {
-                        type: 'year',
+                        type: QUEUE_MODE_YEAR,
                         fromYear: this.queue.yearSelection.from,
                         toYear: this.queue.yearSelection.to,
                         shuffle: random
@@ -460,7 +521,7 @@ export default {
                     }
                     queueTitle = (this.queue.albumSelection.title === '' ? defaultTitle: this.queue.albumSelection.title);
                     queueData = {
-                        type: 'albums',
+                        type: QUEUE_MODE_ALBUM,
                         albumList: this.queue.albumSelection.albumList,
                         shuffle: random,
                         title: queueTitle
@@ -469,8 +530,16 @@ export default {
                 case QUEUE_MODE_PLAYLIST:
                     queueTitle = 'Playlist ' + this.queue.playlistSelection.name;
                     queueData = {
-                        type: 'playlist',
+                        type: QUEUE_MODE_PLAYLIST,
                         playlistId: this.queue.playlistSelection.id,
+                        shuffle: random,
+                        title: queueTitle
+                    };
+                    break;
+                case QUEUE_MODE_FAVORITES:
+                    queueTitle = 'Favoriten';
+                    queueData = {
+                        type: QUEUE_MODE_FAVORITES,
                         shuffle: random,
                         title: queueTitle
                     };
@@ -565,6 +634,12 @@ export default {
             .catch((error) => {
                 this.errorMessage = "Fehler beim Speichern der playlist";
             });
+        },
+        handleScroll(event) {
+            this.stickyButtons.albumSticky = this.$refs['album-selection-button'].getBoundingClientRect().top <= 5;
+            this.stickyButtons.playlistSticky = this.$refs['playlist-selection-button'].getBoundingClientRect().top <= 5;
+            this.stickyButtons.yearSticky = this.$refs['year-selection-button'].getBoundingClientRect().top <= 5;
+            this.stickyButtons.favoritesSticky = this.$refs['favorites-selection-button'].getBoundingClientRect().top <= 5;
         }
     }
 };
@@ -657,5 +732,39 @@ export default {
     .input-group > .custom-range {
         background-color: $progress-bg;
         border: none;
+    }
+
+    #image-control header {
+        position: -webkit-sticky;
+        position: sticky;
+        top: 0;
+        z-index: 100;
+    }
+    #image-control button.not-collapsed {
+        background-color: $success;
+        color: white;
+    }
+
+    #image-control button {
+        transition: width 0.3s, margin-left 0.3s;
+    }
+
+    #image-control button.sticky.not-collapsed {
+        width: 100vw;
+        margin-left: calc(-50vw + 50%);
+        margin-top: -5px;
+    }
+
+    .order-button {
+        height: 5em;
+        width: 5em;
+        border-radius: 50%;
+    }
+</style>
+
+<style>
+    /* This is necessary to make the "sticky-header" work */
+    .accordion > .card {
+        overflow: visible;
     }
 </style>

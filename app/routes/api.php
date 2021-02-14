@@ -39,6 +39,7 @@ Route::get('/index/state', [IndexController::class, 'state']);
 Route::put('/index/update', [IndexController::class, 'update']);
 Route::get('/index/statistics', [IndexController::class, 'statistics']);
 Route::get('/index/years', [IndexController::class, 'years']);
+Route::get('/index/favorites', [IndexController::class, 'favorites']);
 Route::put('/index/toggleFavorite/{index}', [IndexController::class, 'toggleFavorite']);
 Route::delete('/index/{index}', [IndexController::class, 'deleteImage']);
 
